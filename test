@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+<Organization>
+  <id>2</id>
+  <name>a</name>
+  <coordinates>
+    <x>1</x>
+    <y>1</y>
+  </coordinates>
+  <creationDate>1716008528335</creationDate>
+  <annualTurnover>1</annualTurnover>
+  <fullName>a</fullName>
+  <type>TRUST</type>
+  <postalAddress>
+    <zipCode>qweqweqwe</zipCode>
+    <town>
+      <x>1</x>
+      <y>1</y>
+      <z>1</z>
+    </town>
+  </postalAddress>
+  <ownerUsername>qwe</ownerUsername>
+</Organization>
+
+<Organization>
+  <id>1</id>
+  <name>a</name>
+  <coordinates>
+    <x>1</x>
+    <y>1</y>
+  </coordinates>
+  <creationDate>1716006385260</creationDate>
+  <annualTurnover>1</annualTurnover>
+  <fullName>qwe</fullName>
+  <type>TRUST</type>
+  <postalAddress>
+    <zipCode>qweqweqwe</zipCode>
+    <town>
+      <x>1</x>
+      <y>1</y>
+      <z>1</z>
+    </town>
+  </postalAddress>
+  <ownerUsername>qwe</ownerUsername>
+</Organization>
+
+</root>
