@@ -29,9 +29,9 @@ public class Invoker {
             }
 
             if (command == null)
-                return new Response(false, "No such command: " + request.getCommand(), (PriorityQueue<Organization>) null);
+                return new Response(Response.ResponseType.DEFAULT, true, "No such command: " + request.getCommand(), (PriorityQueue<Organization>) null);
             return command.apply(request.getArguments());
         }
-        return new Response(true, "Была исполнена локальная команад");
+        return new Response(Response.ResponseType.DEFAULT,true, "Была исполнена локальная команад");
     }
 }

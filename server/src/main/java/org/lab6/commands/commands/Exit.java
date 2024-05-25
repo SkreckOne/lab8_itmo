@@ -19,6 +19,6 @@ public class Exit extends Command  {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        return new Response(true, "Ждем вас снова");
+        return new Response(Response.ResponseType.DEFAULT,true, "Ждем вас снова");
     }
 }

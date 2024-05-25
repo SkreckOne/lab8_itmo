@@ -24,11 +24,11 @@ public class ExecuteScript extends Command {
     public Response apply(Map<ArgumentType, Object> args) {
         if (args.get(ArgumentType.SCRIPT_NAME) != null) {
             console.println("Использование: '" + getName() + "'");
-            return new Response(true, "Некорректное использование...");
+            return new Response(Response.ResponseType.DEFAULT,true, "Некорректное использование...");
         }
 
         console.println("Выполнение скрипта '" + args.get(ArgumentType.SCRIPT_NAME) + "'...");
-        return new Response(true, "Выполнение скрипта...");
+        return new Response(Response.ResponseType.DEFAULT,true, "Выполнение скрипта...");
 
     }
 

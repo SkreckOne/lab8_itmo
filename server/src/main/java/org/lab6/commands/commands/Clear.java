@@ -30,9 +30,9 @@ public class Clear extends Command {
         try {
             String username = (String) args.get(ArgumentType.USERNAME);
             collectionManager.clear(username);
-            return new Response(true, "Коллекция очищена.");
+            return new Response(Response.ResponseType.DEFAULT,true, "Коллекция очищена.");
         } catch (Exception e) {
-            return new Response(false, "Ошибка при очистке коллекции!");
+            return new Response(Response.ResponseType.DEFAULT,false, "Ошибка при очистке коллекции!");
         }
     }
 

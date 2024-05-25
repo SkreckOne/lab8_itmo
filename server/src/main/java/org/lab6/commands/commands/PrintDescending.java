@@ -26,7 +26,7 @@ public class PrintDescending extends Command {
     public Response apply(Map<ArgumentType, Object> args) {
         try {
             String username = (String) args.get(ArgumentType.USERNAME);
-            return new Response(true, null, collectionManager.getCollectionDescending(username));
+            return new Response(Response.ResponseType.DEFAULT,true, null, collectionManager.getCollectionDescending(username));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

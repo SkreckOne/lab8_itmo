@@ -18,6 +18,6 @@ public class History extends Command  {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        return new Response(true, "История:");
+        return new Response(Response.ResponseType.DEFAULT,true, "История:");
     }
 }

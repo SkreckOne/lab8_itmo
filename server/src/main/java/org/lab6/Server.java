@@ -1,7 +1,5 @@
 package org.lab6;
 
-
-
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.apache.logging.log4j.Logger;
@@ -9,13 +7,11 @@ import common.transfer.Request;
 import common.transfer.Response;
 import org.lab6.commands.Invoker;
 
-
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.*;
-
 
 public class Server {
     private final Selector selector;
@@ -24,6 +20,7 @@ public class Server {
     private final Logger logger = ServerMain.logger;
     private final ByteBuffer buffer;
     private boolean running = true;
+    private boolean processingRequest = false;
 
     public Server(int port, Invoker invoker) throws IOException {
         this.buffer = ByteBuffer.allocate(4096);
@@ -34,6 +31,7 @@ public class Server {
         this.serverSocket.register(selector, SelectionKey.OP_READ);
         this.invoker = invoker;
     }
+
     public void run() throws IOException {
         logger.info("UDP Server started on port " + serverSocket.socket().getLocalPort());
 
@@ -46,7 +44,7 @@ public class Server {
                 SelectionKey key = iter.next();
 
                 if (key.isReadable()) {
-                    handle_request(key);
+                    handleRequest(key);
                 }
 
                 iter.remove();
@@ -56,6 +54,45 @@ public class Server {
         stop();
     }
 
+    private synchronized void handleRequest(SelectionKey key) throws IOException {
+        if (processingRequest) {
+            return;
+        }
+
+        processingRequest = true;
+
+        DatagramChannel channel = (DatagramChannel) key.channel();
+
+        buffer.clear();
+        InetSocketAddress clientAddress = (InetSocketAddress) channel.receive(buffer);
+        if (clientAddress == null) {
+            processingRequest = false;
+            return;
+        }
+
+        buffer.flip();
+        Request request = deserializeRequest();
+        if (request == null) {
+            processingRequest = false;
+            return;
+        }
+        logger.info("Received request from client: " + request);
+
+        // Send ACK
+        sendResponse(channel, clientAddress, new Response(Response.ResponseType.ACK, true, "ACK"));
+
+        // Handle the request and send the actual response
+        Response response;
+        if (request.getRequestType() != Request.RequestType.LOCAL) {
+            response = invoker.handle(request);
+        } else {
+            response = new Response(Response.ResponseType.DEFAULT, false, "Invalid request type");
+        }
+
+        sendResponse(channel, clientAddress, response);
+
+        processingRequest = false;
+    }
 
     private void executeServerCommand() {
         try {
@@ -69,7 +106,7 @@ public class Server {
                 } else {
                     Map<ArgumentType, Object> args = new HashMap<>();
 
-                    Request request = new Request(Request.RequestType.LOCAL, command , args);
+                    Request request = new Request(Request.RequestType.LOCAL, command, args);
                     Response response = invoker.handle(request);
 
                     System.out.println(response.getMessage());
@@ -80,57 +117,42 @@ public class Server {
         }
     }
 
-    private void handle_request(SelectionKey key) throws IOException {
-        System.out.println("req recived");
-        DatagramChannel channel = (DatagramChannel) key.channel();
-
-        buffer.clear();
-
-        var clientAddress = channel.receive(buffer);
-        if (clientAddress == null) {
-            return;
-        }
-
-        buffer.flip();
-
+    private Request deserializeRequest() throws IOException {
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-
-        try {
-            Request request = (Request) ois.readObject();
-            System.out.println(request + " " + request.getRequestType());
-            logger.info("Processing request: " + request);
-            System.out.println(request.getCommand());
-            if (request.getRequestType() != Request.RequestType.LOCAL){
-            Response response;
-            response = invoker.handle(request);
-
-            System.out.println(response.getCommands());
-
-            oos.writeObject(response);
-            oos.flush();
-
-            buffer.clear();
-            buffer.put(bos.toByteArray());
-            buffer.flip();
-            System.out.println(clientAddress);
-            channel.send(buffer, clientAddress);
-            System.out.println(response.getCommands());}
-        } catch (ClassNotFoundException | InvalidClassException e) {
-            logger.error("Failed to read object", e);
+        try (ObjectInputStream ois = new ObjectInputStream(bis)) {
+            return (Request) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            logger.error("Failed to deserialize request", e);
+            return null;
         }
     }
 
+    private void sendResponse(DatagramChannel channel, InetSocketAddress address, Response response) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(response);
+        }
+
+        buffer.clear();
+        buffer.put(bos.toByteArray());
+        buffer.flip();
+
+        channel.send(buffer, address);
+        logger.info("Sent response to client: " + response);
+    }
 
     public void stop() {
         running = false;
         try {
-            serverSocket.close();
+            if (serverSocket.isOpen()) {
+                serverSocket.close();
+            }
+            if (selector.isOpen()) {
+                selector.close();
+            }
         } catch (IOException e) {
             logger.error("Failed to close server socket when stopping: " + e.getMessage(), e);
         }

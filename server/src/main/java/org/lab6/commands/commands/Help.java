@@ -28,6 +28,6 @@ public class Help extends Command  {
                 commandList.add(entry.getValue());
             }
         }
-        return new Response(true, "Справка по командам:", commandList);
+        return new Response(Response.ResponseType.DEFAULT,true, "Справка по командам:", commandList);
     }
 }

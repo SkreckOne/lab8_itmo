@@ -41,10 +41,10 @@ public class Info extends Command {
             infoString += "\n Дата последнего сохранения: " + lastSaveTimeString;
             infoString += "\n Дата последнего сохранения: " + lastInitTimeString;
             console.println("Отправлена информация о коллекции!");
-            return new Response(true, infoString);
+            return new Response(Response.ResponseType.DEFAULT,true, infoString);
         } catch (Exception e) {
             console.println("Ошибка при отправке информации о коллекции!");
-            return new Response(false, "Ошибка при отправке информации о коллекции");
+            return new Response(Response.ResponseType.DEFAULT,false, "Ошибка при отправке информации о коллекции");
         }
     }
 

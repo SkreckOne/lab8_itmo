@@ -26,10 +26,10 @@ public class RemoveHead extends Command {
         String username = (String) args.get(ArgumentType.USERNAME);
         var firstElement = collectionManager.getFirstElement(username);
         if (firstElement == null){
-            return new Response(false, "Коллекция пуста.");
+            return new Response(Response.ResponseType.DEFAULT,false, "Коллекция пуста.");
         }
         var res = collectionManager.remove(firstElement.getId(), username);
-        return new Response(res, "Организация успешно удалена.", new PriorityQueue<>(Collections.singletonList(firstElement)));
+        return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.", new PriorityQueue<>(Collections.singletonList(firstElement)));
     }
     public ArrayList<ArgumentType> getArgumentType() {
         return new ArrayList<>(List.of(ArgumentType.USERNAME));

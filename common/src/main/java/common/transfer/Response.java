@@ -9,30 +9,38 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Response implements Serializable {
+    public enum ResponseType {
+        DEFAULT,
+        ACK
+    }
     private static final long serialVersionUID = 666;
     private final boolean success;
     private final String message;
     private final PriorityQueue<Organization> organizations;
     private final ArrayList<Command> commands;
+    private final ResponseType responseType;
 
-    public Response(boolean success, String message, PriorityQueue<Organization> organizations) {
+    public Response(ResponseType responseType,boolean success, String message, PriorityQueue<Organization> organizations) {
         this.success = success;
         this.message = message;
         this.organizations = organizations;
         this.commands = null;
+        this.responseType = responseType;
     }
-    public Response(boolean success, String message, ArrayList<Command> commands) {
+    public Response(ResponseType responseType, boolean success, String message, ArrayList<Command> commands) {
         this.success = success;
         this.message = message;
         this.organizations = null;
         this.commands = commands;
+        this.responseType = responseType;
     }
 
-    public Response(boolean success, String message) {
+    public Response(ResponseType responseType, boolean success, String message) {
         this.success = success;
         this.message = message;
         this.organizations = null;
         this.commands = null;
+        this.responseType = responseType;
     }
 
     public PriorityQueue<Organization> getOrganizations() {
@@ -42,6 +50,8 @@ public class Response implements Serializable {
     public String getMessage() {
         return message;
     }
+
+    public ResponseType getResponseType() {return this.responseType;}
 
     public boolean isSuccess() {
         return success;

@@ -27,9 +27,9 @@ public class RemoveLower extends Command {
         Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
         var res = collectionManager.removeLower(organization, username);
         if (res)
-            return new Response(res, "Организации успешно удалены.");
+            return new Response(Response.ResponseType.DEFAULT,res, "Организации успешно удалены.");
         else
-            return new Response(res, "Что-то пошло не так");
+            return new Response(Response.ResponseType.DEFAULT,res, "Что-то пошло не так");
     }
     public ArrayList<ArgumentType> getArgumentType() {
         return new ArrayList<>(List.of(ArgumentType.USERNAME, ArgumentType.ORGANIZATION));

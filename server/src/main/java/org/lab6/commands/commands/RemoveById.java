@@ -27,9 +27,9 @@ public class RemoveById extends Command {
         String username = (String) args.get(ArgumentType.USERNAME);
         var res = collectionManager.remove(id, username);
         if (res)
-            return new Response(res, "Организация успешно удалена.");
+            return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.");
         else
-            return new Response(res, "Передан несуществующий ID! Организация не удалена.");
+            return new Response(Response.ResponseType.DEFAULT,res, "Передан несуществующий ID! Организация не удалена.");
     }
 
     public ArrayList<ArgumentType> getArgumentType() {

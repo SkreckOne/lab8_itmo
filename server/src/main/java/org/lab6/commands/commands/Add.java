@@ -30,16 +30,16 @@ public class Add extends Command {
             Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
             organization.setId(collectionManager.getFreeId());
             if (!organization.validate()) {
-                return new Response(false, "Поля организации не валидны! Организация не создана!");
+                return new Response(Response.ResponseType.DEFAULT,false, "Поля организации не валидны! Организация не создана!");
             }
             boolean success = collectionManager.add(organization);
             if (success)
-                return new Response(success, "Организация успешно добавлена!");
+                return new Response(Response.ResponseType.DEFAULT,success, "Организация успешно добавлена!");
             else
-                return new Response(success, "Полное имя не уникально!");
+                return new Response(Response.ResponseType.DEFAULT,success, "Полное имя не уникально!");
         } catch (Exception e) {
             console.printError(e.toString());
-            return new Response(false, e.toString());
+            return new Response(Response.ResponseType.DEFAULT,false, e.toString());
         }
     }
 

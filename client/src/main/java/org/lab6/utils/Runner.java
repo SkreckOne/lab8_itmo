@@ -16,8 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-
-
 public class Runner {
     private final Client client;
 
@@ -33,39 +31,31 @@ public class Runner {
     private final List<String> scriptStack = new ArrayList<>();
     private String username;
 
-
     public Runner(Console console, Client client) throws IOException, ClassNotFoundException {
         this.client = client;
         this.console = console;
         this.commandManager = new CommandManager();
         this.responseHandler = new ResponseHandler();
-//        console.println(this.commandManager.getCommands());
     }
 
-    public void login(){
-        String username;
-        while (true){
+    public void login() {
+        while (true) {
             console.print("Введите ваше пользовательское имя: ");
             username = console.readln().trim();
-            try{
+            try {
                 if (username.isEmpty()) throw new ValidateExeption("fullname mustn't be null.");
                 else break;
-            }
-            catch (ValidateExeption e){
+            } catch (ValidateExeption e) {
                 console.printError(e.getMessage());
             }
         }
-
-        this.username = username;
         interactiveMode();
-
     }
-
 
     public void interactiveMode() {
         try {
             ExitCode commandStatus;
-            String[] userCommand = {"", ""};
+            String[] userCommand;
 
             do {
                 console.prompt();
@@ -79,13 +69,11 @@ public class Runner {
         } catch (NoSuchElementException exception) {
             console.printError("Пользовательский ввод не обнаружен!");
         } catch (RuntimeException e) {
-            console.printError("Непредвиденная ошибка!");
+            console.printError("Непредвиденная ошибка! int mode" + e.getMessage());
         } catch (ClassNotFoundException | IOException | ValidateExeption e) {
             throw new RuntimeException(e);
         }
     }
-
-
 
     public ExitCode scriptMode(String argument) {
         String[] userCommand = {"", ""};
@@ -104,8 +92,7 @@ public class Runner {
                 }
                 if (userCommand[0].equals("execute_script")) {
                     for (String script : scriptStack) {
-                        if (userCommand[1].equals(script))
-                        {
+                        if (userCommand[1].equals(script)) {
                             console.selectConsoleScanner();
                             throw new ScriptRecursionException();
                         }
@@ -128,7 +115,7 @@ public class Runner {
         } catch (ScriptRecursionException exception) {
             console.printError("Скрипты не могут вызываться рекурсивно!");
         } catch (IllegalStateException exception) {
-            console.printError("Непредвиденная ошибка!");
+            console.printError("Непредвиденная ошибка! script mode");
             System.exit(0);
         } catch (ValidateExeption | IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -154,7 +141,7 @@ public class Runner {
                     args.put(ArgumentType.ORGANIZATION, InstanceFiller.fillOrganization(console, username));
                     break;
                 case SCRIPT_NAME:
-                    args.put(ArgumentType.ORGANIZATION, userCommand[1]);
+                    args.put(ArgumentType.SCRIPT_NAME, userCommand[1]);
                     break;
                 case USERNAME:
                     args.put(ArgumentType.USERNAME, username);
@@ -169,10 +156,7 @@ public class Runner {
         return args;
     }
 
-    public Console getConsole(){return this.console;}
-
-
-    private ExitCode launchCommand(String[] userCommand) throws  ValidateExeption, IOException, ClassNotFoundException {
+    private ExitCode launchCommand(String[] userCommand) throws ValidateExeption, IOException, ClassNotFoundException {
         if (userCommand[0].isEmpty()) return ExitCode.OK;
         Command command = commandManager.getCommands().get(userCommand[0]);
         if (command == null) {
@@ -200,14 +184,14 @@ public class Runner {
                     console.printError(e.getMessage());
                     return ExitCode.ERROR;
                 }
-                var response = (Response) client.sendAndReceiveCommand(new Request(Request.RequestType.DEFAULT,command, args));
-                if (!response.isSuccess()) {
-                    console.printError(response.getMessage());
+                Response response = client.sendAndReceiveCommand(new Request(Request.RequestType.DEFAULT, command, args));
+                if (response == null || !response.isSuccess()) {
+                    console.printError(response != null ? response.getMessage() : "Не удалось получить ответ от сервера");
                     return ExitCode.ERROR;
                 }
                 responseHandler.handle(console, response);
             }
-        };
+        }
 
         return ExitCode.OK;
     }

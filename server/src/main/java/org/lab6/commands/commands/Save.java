@@ -23,6 +23,6 @@ public  class Save extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         collectionManager.saveCollection();
-        return new Response(true, "Коллекция была сохранена.");
+        return new Response(Response.ResponseType.DEFAULT,true, "Коллекция была сохранена.");
     }
 }

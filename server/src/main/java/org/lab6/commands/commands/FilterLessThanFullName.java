@@ -27,7 +27,7 @@ public class FilterLessThanFullName extends Command {
         try {
             String username = (String) args.get(ArgumentType.USERNAME);
             String fullname = (String) args.get(ArgumentType.FULLNAME);
-            return new Response(true, null, collectionManager.lowerGreaterThan(username, fullname));
+            return new Response(Response.ResponseType.DEFAULT,true, null, collectionManager.lowerGreaterThan(username, fullname));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

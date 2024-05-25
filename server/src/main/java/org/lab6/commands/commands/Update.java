@@ -29,20 +29,20 @@ public class Update extends Command {
             String username = (String) args.get(ArgumentType.USERNAME);
             var old = collectionManager.getById(id, username);
             if (old == null || !collectionManager.getCollection(username).contains(old)) {
-                return new Response(false, "Передан несуществующий ID!");
+                return new Response(Response.ResponseType.DEFAULT,false, "Передан несуществующий ID!");
             }
             Organization d = (Organization) args.get(ArgumentType.ORGANIZATION);
             d.setId(id);
             if (d.validate()) {
                 collectionManager.remove(old.getId(), username);
                 collectionManager.add(d);
-                return new Response(true, null);
+                return new Response(Response.ResponseType.DEFAULT,true, null);
             } else {
-                return new Response(false, "Поля не валидны! Организация не создана");
+                return new Response(Response.ResponseType.DEFAULT,false, "Поля не валидны! Организация не создана");
             }
         } catch (Exception e) {
             console.printError(e.toString());
-            return new Response(false, e.toString());
+            return new Response(Response.ResponseType.DEFAULT,false, e.toString());
         }
     }
 
