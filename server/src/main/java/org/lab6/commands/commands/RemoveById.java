@@ -24,8 +24,7 @@ public class RemoveById extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         int id = (int) args.get(ArgumentType.ID);
-        String username = (String) args.get(ArgumentType.USERNAME);
-        var res = collectionManager.remove(id, username);
+        var res = collectionManager.remove(id);
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.");
         else
@@ -33,6 +32,6 @@ public class RemoveById extends Command {
     }
 
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.ID, ArgumentType.USERNAME));
+        return new ArrayList<>(List.of(ArgumentType.ID));
     }
 }

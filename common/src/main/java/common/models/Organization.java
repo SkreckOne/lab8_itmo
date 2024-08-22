@@ -21,8 +21,9 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
     private OrganizationType type; //Поле не может быть null
     private Address postalAddress; //Поле может быть null
     private String owner_username;
+    private long owner_id;
 
-    public Organization(int id, String name, Coordinates coordinates, Long annualTurnover, String fullName, OrganizationType type, Address postalAddress, String owner_username){
+    public Organization(int id, String name, Coordinates coordinates, Long annualTurnover, String fullName, OrganizationType type, Address postalAddress, String owner_username, long owner_id){
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -32,6 +33,7 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
         this.type = type;
         this.postalAddress = postalAddress;
         this.owner_username = owner_username;
+        this.owner_id = owner_id;
     }
 
     public Organization() {}

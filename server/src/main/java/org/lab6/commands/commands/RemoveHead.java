@@ -23,15 +23,14 @@ public class RemoveHead extends Command {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        String username = (String) args.get(ArgumentType.USERNAME);
-        var firstElement = collectionManager.getFirstElement(username);
+        var firstElement = collectionManager.getFirstElement();
         if (firstElement == null){
             return new Response(Response.ResponseType.DEFAULT,false, "Коллекция пуста.");
         }
-        var res = collectionManager.remove(firstElement.getId(), username);
+        var res = collectionManager.remove(firstElement.getId());
         return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.", new PriorityQueue<>(Collections.singletonList(firstElement)));
     }
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.USERNAME));
+        return new ArrayList<>();
     }
 }

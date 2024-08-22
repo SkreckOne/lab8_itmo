@@ -38,19 +38,6 @@ public class Runner {
         this.responseHandler = new ResponseHandler();
     }
 
-    public void login() {
-        while (true) {
-            console.print("Введите ваше пользовательское имя: ");
-            username = console.readln().trim();
-            try {
-                if (username.isEmpty()) throw new ValidateExeption("fullname mustn't be null.");
-                else break;
-            } catch (ValidateExeption e) {
-                console.printError(e.getMessage());
-            }
-        }
-        interactiveMode();
-    }
 
     public void interactiveMode() {
         try {
@@ -142,9 +129,6 @@ public class Runner {
                     break;
                 case SCRIPT_NAME:
                     args.put(ArgumentType.SCRIPT_NAME, userCommand[1]);
-                    break;
-                case USERNAME:
-                    args.put(ArgumentType.USERNAME, username);
                     break;
                 case FULLNAME:
                     args.put(ArgumentType.FULLNAME, userCommand[1]);

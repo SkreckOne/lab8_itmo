@@ -15,7 +15,7 @@ public class RemoveHead extends Command {
     }
 
     @Override
-    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.USERNAME));}
+    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>();}
 
     @Override
     public Response apply(Map<ArgumentType, Object> args){return null;}

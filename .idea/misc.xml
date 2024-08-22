@@ -10,6 +10,11 @@
         <option value="$PROJECT_DIR$/server/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/scripts/pom.xml" />
+      </set>
+    </option>
   </component>
   <component name="PWA">
     <option name="wasEnabledAtLeastOnce" value="true" />

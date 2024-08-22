@@ -6,6 +6,5 @@ public enum ArgumentType implements Serializable {
     ID,
     ORGANIZATION,
     SCRIPT_NAME,
-    USERNAME,
     FULLNAME,
 }

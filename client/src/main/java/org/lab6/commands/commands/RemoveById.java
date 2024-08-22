@@ -14,7 +14,7 @@ public class RemoveById extends Command {
     }
 
     @Override
-        public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.ID, ArgumentType.USERNAME));}
+        public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.ID));}
 
     @Override
     public Response apply(Map<ArgumentType, Object> args){return null;}

@@ -28,8 +28,7 @@ public class Clear extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         try {
-            String username = (String) args.get(ArgumentType.USERNAME);
-            collectionManager.clear(username);
+            collectionManager.clear();
             return new Response(Response.ResponseType.DEFAULT,true, "Коллекция очищена.");
         } catch (Exception e) {
             return new Response(Response.ResponseType.DEFAULT,false, "Ошибка при очистке коллекции!");
@@ -37,6 +36,6 @@ public class Clear extends Command {
     }
 
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.USERNAME));
+        return new ArrayList<>();
     }
 }

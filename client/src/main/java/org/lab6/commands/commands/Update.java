@@ -14,7 +14,7 @@ public class Update extends Command {
     }
 
     @Override
-    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.ID, ArgumentType.USERNAME, ArgumentType.ORGANIZATION));}
+    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.ID, ArgumentType.ORGANIZATION));}
 
     @Override
     public Response apply(Map<ArgumentType, Object> args){return null;}

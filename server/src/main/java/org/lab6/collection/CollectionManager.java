@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 public class CollectionManager {
     private final PriorityQueue<Organization> collection = new PriorityQueue<>();
 
-    private final DumpManager dumpManager;
+    private final DatabaseManager dbManager;
     private LocalDateTime lastInitTime;
     private LocalDateTime lastSaveTime;
     private long currentId = 1;
 
 
-    public CollectionManager(DumpManager dumpManager) {
-        this.dumpManager = dumpManager;
+    public CollectionManager(DatabaseManager dbManager) {
+        this.dbManager = dbManager;
     }
 
     public LocalDateTime getLastInitTime() {
@@ -43,7 +43,7 @@ public class CollectionManager {
 
     public boolean init() {
         collection.clear();
-        dumpManager.readCollection(collection);
+        dbManager.readCollection(collection);
         lastInitTime = LocalDateTime.now();
         for (Organization organization : collection) {
             long id = organization.getId();
@@ -55,23 +55,21 @@ public class CollectionManager {
     }
 
     public long getFreeId() {
-        while (getById(currentId, null) != null)
+        while (getById(currentId) != null)
             if (++currentId < 0)
                 currentId = 1;
         return currentId;
     }
 
-    public Organization getById(long id, String username) {
+    public Organization getById(long id) {
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .filter(organization -> organization.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
 
-    public Organization getByFullname(String fullname, String username) {
+    public Organization getByFullname(String fullname) {
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .filter(organization -> organization.getFullName().equals(fullname))
                 .findFirst()
                 .orElse(null);
@@ -84,22 +82,20 @@ public class CollectionManager {
     }
 
     public boolean contains(Organization organization) {
-        return organization == null || getById(organization.getId(), organization.getOwnerUsername()) != null || getByFullname(organization.getFullName(), organization.getOwnerUsername()) != null;
+        return organization == null || getById(organization.getId()) != null || getByFullname(organization.getFullName()) != null;
     }
 
     public void saveCollection() {
-        dumpManager.writeCollection(collection);
+        dbManager.writeCollection(collection);
         lastSaveTime = LocalDateTime.now();
     }
 
-    public void clear(String username) {
-        collection.removeIf(org -> org.getOwnerUsername().equals(username));
+    public void clear() {
+        collection.clear();
     }
 
-    public PriorityQueue<Organization> getCollection(String username) {
-        return collection.stream()
-                .filter(org -> org.getOwnerUsername().equals(username))
-                .collect(Collectors.toCollection(PriorityQueue::new));
+    public PriorityQueue<Organization> getCollection() {
+        return collection;
     }
 
 
@@ -107,48 +103,42 @@ public class CollectionManager {
         return collection.getClass().getName();
     }
 
-    public long collectionSize(String username) {
-        return collection.stream()
-                .filter(org -> org.getOwnerUsername().equals(username))
-                .count();
+    public long collectionSize() {
+        return collection.size();
     }
 
-    public boolean remove(long id, String username) {
-        Organization orgToRem = getById(id, username);
+    public boolean remove(long id) {
+        Organization orgToRem = getById(id);
         if (orgToRem == null) return false;
         collection.remove(orgToRem);
         return true;
     }
 
-    public Organization getFirstElement(String username) {
+    public Organization getFirstElement() {
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .min(Organization::compareTo)
                 .orElse(null);
     }
 
-    public boolean removeLower(Organization organization, String username) {
-        return collection.removeIf(org -> (username == null || org.getOwnerUsername().equals(username)) && org.compareTo(organization) < 0);
+    public boolean removeLower(Organization organization) {
+        return collection.removeIf(org -> (org.compareTo(organization) < 0));
     }
 
-    public PriorityQueue<Organization> getGreaterThan(String username, String fullname) {
+    public PriorityQueue<Organization> getGreaterThan(String fullname) {
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .filter(organization -> organization.getFullName().compareTo(fullname) > 0)
                 .collect(Collectors.toCollection(PriorityQueue::new));
     }
 
-    public PriorityQueue<Organization> lowerGreaterThan(String username, String fullname) {
+    public PriorityQueue<Organization> lowerGreaterThan(String fullname) {
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .filter(organization -> organization.getFullName().compareTo(fullname) < 0)
                 .collect(Collectors.toCollection(PriorityQueue::new));
     }
 
-    public PriorityQueue<Organization> getCollectionDescending(String username) {
+    public PriorityQueue<Organization> getCollectionDescending() {
         Comparator<Organization> reversedComparator = Comparator.reverseOrder();
         return collection.stream()
-                .filter(org -> username == null || org.getOwnerUsername().equals(username))
                 .collect(Collectors.toCollection(() -> new PriorityQueue<>(reversedComparator)));
     }
 }

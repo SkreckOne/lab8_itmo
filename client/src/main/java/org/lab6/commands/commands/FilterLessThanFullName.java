@@ -15,7 +15,7 @@ public class FilterLessThanFullName extends Command {
     }
 
     @Override
-    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.USERNAME, ArgumentType.FULLNAME));}
+    public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>(List.of(ArgumentType.FULLNAME));}
 
     @Override
     public Response apply(Map<ArgumentType, Object> args){return null;}

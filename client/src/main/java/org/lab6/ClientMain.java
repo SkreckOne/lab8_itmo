@@ -18,8 +18,8 @@ public class ClientMain {
     public static void main(String[] args) {
         var console = new StandardConsole();
         try {
-            var client = new Client(InetAddress.getLocalHost(), PORT);
-            new Runner(console, client).login();
+            var client = new Client(InetAddress.getByName("127.0.0.1"), PORT);
+            new Runner(console, client);
             client.close();
         } catch (ConnectException e) {
             logger.error("Сервер недоступен");

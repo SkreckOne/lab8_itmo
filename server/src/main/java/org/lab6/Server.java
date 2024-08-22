@@ -20,7 +20,6 @@ public class Server {
     private final Logger logger = ServerMain.logger;
     private final ByteBuffer buffer;
     private boolean running = true;
-    private boolean processingRequest = false;
 
     public Server(int port, Invoker invoker) throws IOException {
         this.buffer = ByteBuffer.allocate(4096);
@@ -54,44 +53,36 @@ public class Server {
         stop();
     }
 
-    private synchronized void handleRequest(SelectionKey key) throws IOException {
-        if (processingRequest) {
-            return;
+    private void handleRequest(SelectionKey key) {
+        try {
+            DatagramChannel channel = (DatagramChannel) key.channel();
+
+            buffer.clear();
+            InetSocketAddress clientAddress = (InetSocketAddress) channel.receive(buffer);
+            if (clientAddress == null) {
+                return;
+            }
+
+            buffer.flip();
+            Request request = deserializeRequest();
+            if (request == null) {
+                return;
+            }
+            logger.info("Received request from client: " + request);
+
+            sendResponse(channel, clientAddress, new Response(Response.ResponseType.ACK, true, "ACK"));
+
+            Response response;
+            if (request.getRequestType() != Request.RequestType.LOCAL) {
+                response = invoker.handle(request);
+            } else {
+                response = new Response(Response.ResponseType.DEFAULT, false, "Invalid request type");
+            }
+
+            sendResponse(channel, clientAddress, response);
+        } catch (IOException e) {
+            logger.error("Failed to handle request", e);
         }
-
-        processingRequest = true;
-
-        DatagramChannel channel = (DatagramChannel) key.channel();
-
-        buffer.clear();
-        InetSocketAddress clientAddress = (InetSocketAddress) channel.receive(buffer);
-        if (clientAddress == null) {
-            processingRequest = false;
-            return;
-        }
-
-        buffer.flip();
-        Request request = deserializeRequest();
-        if (request == null) {
-            processingRequest = false;
-            return;
-        }
-        logger.info("Received request from client: " + request);
-
-        // Send ACK
-        sendResponse(channel, clientAddress, new Response(Response.ResponseType.ACK, true, "ACK"));
-
-        // Handle the request and send the actual response
-        Response response;
-        if (request.getRequestType() != Request.RequestType.LOCAL) {
-            response = invoker.handle(request);
-        } else {
-            response = new Response(Response.ResponseType.DEFAULT, false, "Invalid request type");
-        }
-
-        sendResponse(channel, clientAddress, response);
-
-        processingRequest = false;
     }
 
     private void executeServerCommand() {
@@ -147,12 +138,8 @@ public class Server {
     public void stop() {
         running = false;
         try {
-            if (serverSocket.isOpen()) {
-                serverSocket.close();
-            }
-            if (selector.isOpen()) {
-                selector.close();
-            }
+            serverSocket.close();
+            selector.close();
         } catch (IOException e) {
             logger.error("Failed to close server socket when stopping: " + e.getMessage(), e);
         }

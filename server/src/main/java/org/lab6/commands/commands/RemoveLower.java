@@ -23,15 +23,14 @@ public class RemoveLower extends Command {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        String username = (String) args.get(ArgumentType.USERNAME);
         Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
-        var res = collectionManager.removeLower(organization, username);
+        var res = collectionManager.removeLower(organization);
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организации успешно удалены.");
         else
             return new Response(Response.ResponseType.DEFAULT,res, "Что-то пошло не так");
     }
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.USERNAME, ArgumentType.ORGANIZATION));
+        return new ArrayList<>(List.of(ArgumentType.ORGANIZATION));
     }
 }

@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import common.console.*;
 import org.lab6.collection.CollectionManager;
-import org.lab6.collection.DumpManager;
+import org.lab6.collection.DatabaseManager;
 import org.lab6.commands.CommandManager;
 import org.lab6.commands.Invoker;
 
@@ -22,14 +22,12 @@ public class ServerMain {
     public static void main(String[] args) {
         Console console = new StandardConsole();
 
-        String filename = System.getenv("FILENAME");
-        if (filename == null || filename.isEmpty()) {
-            System.out.println("Задайте имя загружаемого файла с помощью переменной среды FILENAME");
-            System.exit(1);
-        }
-        System.out.println(filename);
-        var dumpManager = new DumpManager(filename, console);
-        var collectionManager = new CollectionManager(dumpManager);
+        String dbUrl = System.getenv("DBURL");
+        String dbUser = System.getenv("DBUSER");
+        String dbPass = System.getenv("DBPASS");
+
+        var dbManager = new DatabaseManager(dbUrl, dbUser, dbPass, console);
+        var collectionManager = new CollectionManager(dbManager);
         if (!collectionManager.init()) { System.exit(1); }
 
         collectionManager.validateAll(console);

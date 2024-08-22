@@ -10,6 +10,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Iterator;
 
 public class Client {
 
@@ -17,78 +20,85 @@ public class Client {
     private final InetSocketAddress serverAddress;
     private final Logger logger = getLogger(ClientMain.class);
     private final ByteBuffer buffer;
-    private boolean waitingForAck = false;
+    private final Selector selector;
 
     public Client(InetAddress hostname, int port) throws IOException {
         this.buffer = ByteBuffer.allocate(4096);
         this.serverAddress = new InetSocketAddress(hostname, port);
         this.client = DatagramChannel.open();
         this.client.configureBlocking(false);
+        this.selector = Selector.open();
+        this.client.register(selector, SelectionKey.OP_READ);
         logger.info("DatagramChannel opened connection to " + serverAddress);
     }
 
-    public synchronized Response sendAndReceiveCommand(Request request) throws IOException, ClassNotFoundException {
-        while (waitingForAck) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                logger.error("Interrupted while waiting for ACK", e);
-            }
-        }
-
+    public Response sendAndReceiveCommand(Request request) throws IOException, ClassNotFoundException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(request);
         oos.flush();
-        byte[] requestBytes = bos.toByteArray();
 
         buffer.clear();
-        buffer.put(requestBytes);
+        buffer.put(bos.toByteArray());
         buffer.flip();
 
-        waitingForAck = true;
-        client.send(buffer, serverAddress);
-        logger.info("Request sent to server: " + request);
-
-        long startTime = System.currentTimeMillis();
+        long startTime;
         boolean ackReceived = false;
 
-        // Loop to wait for ACK with a timeout of 3 seconds
         while (!ackReceived) {
-            buffer.clear();
-            InetSocketAddress responseAddress = (InetSocketAddress) client.receive(buffer);
-            if (responseAddress != null) {
-                buffer.flip();
-                Response receivedResponse = deserializeResponse();
-                if (receivedResponse.getResponseType() == Response.ResponseType.ACK) {
-                    logger.info("Received ACK from server");
-                    ackReceived = true;
-                    waitingForAck = false;
-                    notifyAll();
+            client.send(buffer, serverAddress);
+            logger.info("Request sent to server: " + request);
+
+            startTime = System.currentTimeMillis();
+
+            while (System.currentTimeMillis() - startTime < 3000 && !ackReceived) {
+                selector.select(3000);
+                Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
+
+                while (iter.hasNext()) {
+                    SelectionKey key = iter.next();
+                    if (key.isReadable()) {
+                        buffer.clear();
+                        InetSocketAddress responseAddress = (InetSocketAddress) client.receive(buffer);
+                        if (responseAddress != null) {
+                            buffer.flip();
+                            Response receivedResponse = deserializeResponse();
+                            if (receivedResponse.getResponseType() == Response.ResponseType.ACK) {
+                                logger.info("Received ACK from server");
+                                ackReceived = true;
+                                break;
+                            }
+                        }
+                    }
+                    iter.remove();
                 }
             }
 
-            if (!ackReceived && System.currentTimeMillis() - startTime >= 3000) {
+            if (!ackReceived) {
                 logger.info("ACK not received, resending request");
-                buffer.clear();
-                buffer.put(requestBytes);
                 buffer.flip();
-                client.send(buffer, serverAddress);
-                startTime = System.currentTimeMillis();
             }
         }
 
-        // Wait for the actual response after receiving the ACK
         Response response = null;
         while (response == null) {
-            buffer.clear();
-            InetSocketAddress responseAddress = (InetSocketAddress) client.receive(buffer);
-            if (responseAddress != null) {
-                buffer.flip();
-                response = deserializeResponse();
-                if (response.getResponseType() != Response.ResponseType.ACK) {
-                    logger.info("Received response from server: " + response);
+            selector.select();
+            Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
+
+            while (iter.hasNext()) {
+                SelectionKey key = iter.next();
+                if (key.isReadable()) {
+                    buffer.clear();
+                    InetSocketAddress responseAddress = (InetSocketAddress) client.receive(buffer);
+                    if (responseAddress != null) {
+                        buffer.flip();
+                        response = deserializeResponse();
+                        if (response.getResponseType() != Response.ResponseType.ACK) {
+                            logger.info("Received response from server: " + response);
+                        }
+                    }
                 }
+                iter.remove();
             }
         }
 
@@ -108,6 +118,9 @@ public class Client {
     public void close() throws IOException {
         if (client != null) {
             client.close();
+        }
+        if (selector != null) {
+            selector.close();
         }
         logger.info("Connection to server " + serverAddress + " closed.");
     }

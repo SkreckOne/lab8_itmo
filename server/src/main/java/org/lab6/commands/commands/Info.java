@@ -26,7 +26,6 @@ public class Info extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         try {
-            String username = (String) args.get(ArgumentType.USERNAME);
             String infoString = "";
             LocalDateTime lastInitTime = collectionManager.getLastInitTime();
             String lastInitTimeString = (lastInitTime == null) ? "в данной сессии инициализации еще не происходило" :
@@ -37,7 +36,7 @@ public class Info extends Command {
                     lastSaveTime.toLocalDate().toString() + " " + lastSaveTime.toLocalTime().toString();
             infoString += "Сведения о коллекции:";
             infoString += "\n Тип: " + collectionManager.collectionType();
-            infoString += "\n Количество элементов: " + collectionManager.collectionSize(username);
+            infoString += "\n Количество элементов: " + collectionManager.collectionSize();
             infoString += "\n Дата последнего сохранения: " + lastSaveTimeString;
             infoString += "\n Дата последнего сохранения: " + lastInitTimeString;
             console.println("Отправлена информация о коллекции!");
@@ -49,6 +48,6 @@ public class Info extends Command {
     }
 
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.USERNAME));
+        return new ArrayList<>();
     }
 }

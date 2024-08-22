@@ -26,15 +26,14 @@ public class Update extends Command {
     public Response apply(Map<ArgumentType, Object> args) {
         try {
             int id = (int) args.get(ArgumentType.ID);
-            String username = (String) args.get(ArgumentType.USERNAME);
-            var old = collectionManager.getById(id, username);
-            if (old == null || !collectionManager.getCollection(username).contains(old)) {
+            var old = collectionManager.getById(id);
+            if (old == null || !collectionManager.getCollection().contains(old)) {
                 return new Response(Response.ResponseType.DEFAULT,false, "Передан несуществующий ID!");
             }
             Organization d = (Organization) args.get(ArgumentType.ORGANIZATION);
             d.setId(id);
             if (d.validate()) {
-                collectionManager.remove(old.getId(), username);
+                collectionManager.remove(old.getId());
                 collectionManager.add(d);
                 return new Response(Response.ResponseType.DEFAULT,true, null);
             } else {
@@ -47,6 +46,6 @@ public class Update extends Command {
     }
 
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(java.util.List.of(ArgumentType.ID, ArgumentType.USERNAME, ArgumentType.ORGANIZATION));
+        return new ArrayList<>(java.util.List.of(ArgumentType.ID, ArgumentType.ORGANIZATION));
     }
 }

@@ -25,14 +25,13 @@ public class FilterGreaterThanFullName extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         try {
-            String username = (String) args.get(ArgumentType.USERNAME);
             String fullname = (String) args.get(ArgumentType.FULLNAME);
-            return new Response(Response.ResponseType.DEFAULT,true, null, collectionManager.getGreaterThan(username, fullname));
+            return new Response(Response.ResponseType.DEFAULT,true, null, collectionManager.getGreaterThan(fullname));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.USERNAME, ArgumentType.FULLNAME));
+        return new ArrayList<>(List.of(ArgumentType.FULLNAME));
     }
 }
