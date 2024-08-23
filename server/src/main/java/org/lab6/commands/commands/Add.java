@@ -28,7 +28,6 @@ public class Add extends Command {
     public Response apply(Map<ArgumentType, Object> args) {
         try {
             Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
-            organization.setId(collectionManager.getFreeId());
             if (!organization.validate()) {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля организации не валидны! Организация не создана!");
             }

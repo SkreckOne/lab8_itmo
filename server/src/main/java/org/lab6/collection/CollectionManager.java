@@ -17,8 +17,6 @@ public class CollectionManager {
     private final DatabaseManager dbManager;
     private LocalDateTime lastInitTime;
     private LocalDateTime lastSaveTime;
-    private long currentId = 1;
-
 
     public CollectionManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
@@ -45,20 +43,7 @@ public class CollectionManager {
         collection.clear();
         dbManager.readCollection(collection);
         lastInitTime = LocalDateTime.now();
-        for (Organization organization : collection) {
-            long id = organization.getId();
-            if (id > currentId) {
-                currentId = id;
-            }
-        }
         return true;
-    }
-
-    public long getFreeId() {
-        while (getById(currentId) != null)
-            if (++currentId < 0)
-                currentId = 1;
-        return currentId;
     }
 
     public Organization getById(long id) {

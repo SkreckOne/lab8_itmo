@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Organization implements Serializable, Validatable, Comparable<Organization> {
-    private static final long serialVersionUID = 10L;
-    private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+    private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
     private Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -20,25 +19,30 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
     private String fullName; //Длина строки не должна быть больше 1322, Значение этого поля должно быть уникальным, Поле не может быть null
     private OrganizationType type; //Поле не может быть null
     private Address postalAddress; //Поле может быть null
-    private String owner_username;
-    private long owner_id;
+    private int owner_id;
 
-    public Organization(int id, String name, Coordinates coordinates, Long annualTurnover, String fullName, OrganizationType type, Address postalAddress, String owner_username, long owner_id){
+    public Organization(int id, String name, Coordinates coordinates, Date date , Long annualTurnover, String fullName, OrganizationType type, Address postalAddress, int owner_id){
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
-        this.creationDate = new Date();
+        this.creationDate = date;
         this.annualTurnover = annualTurnover;
         this.fullName = fullName;
         this.type = type;
         this.postalAddress = postalAddress;
-        this.owner_username = owner_username;
         this.owner_id = owner_id;
     }
 
-    public Organization() {}
 
-
+    public Organization(String name, Coordinates coordinates, Long annualTurnover, String fullName, OrganizationType type, Address postalAddress, int owner_id){
+        this.name = name;
+        this.coordinates = coordinates;
+        this.annualTurnover = annualTurnover;
+        this.fullName = fullName;
+        this.type = type;
+        this.postalAddress = postalAddress;
+        this.owner_id = owner_id;
+    }
 
     @Override
     public boolean validate(){
@@ -57,10 +61,8 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
 
     @Override
     public String toString() {
-        // Define a format for each row of the table
         String rowFormat = "| %-16s | %-50s |\n";
 
-        // Construct the table with String.format, using the row format
         StringBuilder sb = new StringBuilder();
         sb.append(String.format(rowFormat, "Field", "Value"));
         sb.append(String.format(rowFormat, "ID", id));
@@ -75,7 +77,7 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
         return sb.toString();
     }
 
-    public long getId(){return this.id;}
+    public int getId(){return this.id;}
     public String getName(){return this.name;}
     public Coordinates getCoordinates(){return this.coordinates;}
     public Date getCreationDate(){return this.creationDate;}
@@ -83,17 +85,17 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
     public String getFullName(){return this.fullName;}
     public OrganizationType getType(){return this.type;}
     public Address getPostalAddress(){return this.postalAddress;}
-    public String getOwnerUsername(){return this.owner_username;}
+    public int getOwnerId() {return this.owner_id;}
 
     public void setName(String name){this.name = name;}
     public void setCoordinates(Coordinates coordinates){this.coordinates = coordinates;}
     public void setCreationDate(Date creationDate){this.creationDate = creationDate;}
-    public void setId(long id){this.id = id;}
+    public void setId(int id){this.id = id;}
     public void setFullName(String fullName){this.fullName = fullName;}
     public void setType(OrganizationType type){this.type = type;}
     public void setPostalAddress(Address postalAddress){this.postalAddress = postalAddress;}
     public void setAnnualTurnover(Long annualTurnover){this.annualTurnover = annualTurnover;}
-    public void setOwnerUsername(String username){this.owner_username = username;}
+    public void setOwnerId (int id) {this.owner_id = id;}
 
     @Override
     public boolean equals(Object o) {

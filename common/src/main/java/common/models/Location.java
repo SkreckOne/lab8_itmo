@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Location implements Serializable {
-    private static final long serialVersionUID = 1L;
     private long x;
     private long y;
     private long z;
@@ -14,8 +13,6 @@ public class Location implements Serializable {
         this.y = y;
         this.z = z;
     }
-
-    public Location(){}
 
     @Override
     public String toString(){

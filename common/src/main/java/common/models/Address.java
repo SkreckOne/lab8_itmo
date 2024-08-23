@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Address implements Serializable, Validatable {
-    private static final long serialVersionUID = 2L;
     private String zipCode; //Длина строки должна быть не меньше 8, Поле не может быть null
     private Location town; //Поле не может быть null
 
@@ -15,8 +14,6 @@ public class Address implements Serializable, Validatable {
         this.zipCode = zipCode;
         this.town = town;
     }
-
-    public Address(){}
 
     @Override
     public boolean validate(){

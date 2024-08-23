@@ -1,10 +1,12 @@
 package org.lab6;
 
 
+import common.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import common.console.*;
+
 import org.lab6.collection.CollectionManager;
 import org.lab6.collection.DatabaseManager;
 import org.lab6.commands.CommandManager;
@@ -22,27 +24,26 @@ public class ServerMain {
     public static void main(String[] args) {
         Console console = new StandardConsole();
 
-        String dbUrl = System.getenv("DBURL");
-        String dbUser = System.getenv("DBUSER");
-        String dbPass = System.getenv("DBPASS");
-
-        var dbManager = new DatabaseManager(dbUrl, dbUser, dbPass, console);
+        var dbManager = new DatabaseManager("jdbc:postgresql://localhost:5432/mydatabase", console);
+        dbManager.connect();
         var collectionManager = new CollectionManager(dbManager);
+
         if (!collectionManager.init()) { System.exit(1); }
-
-        collectionManager.validateAll(console);
-        Runtime.getRuntime().addShutdownHook(new Thread(collectionManager::saveCollection));
-        var commandManager = new CommandManager(collectionManager, console);
-
-        try {
-            var server = new Server(PORT, new Invoker(commandManager));
-            server.run();
-        } catch (SocketException e) {
-            logger.fatal("Случилась ошибка сокета", e);
-        } catch (UnknownHostException e) {
-            logger.fatal("Неизвестный хост", e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        Runtime.getRuntime().addShutdownHook(new Thread(collectionManager::saveCollection));
+//        var commandManager = new CommandManager(collectionManager, console);
+//
+//        try {
+//            var server = new Server(PORT, new Invoker(commandManager));
+//            server.run();
+//        } catch (SocketException e) {
+//            logger.fatal("Случилась ошибка сокета", e);
+//        } catch (UnknownHostException e) {
+//            logger.fatal("Неизвестный хост", e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        finally {
+//            dbManager.closeConnection();
+//        }
     }
 }

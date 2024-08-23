@@ -9,7 +9,6 @@ import java.security.PublicKey;
 import java.util.Objects;
 
 public class Coordinates implements Serializable, Validatable {
-    private static final long serialVersionUID = 2L;
     private Integer x; //Значение поля должно быть больше -465, Поле не может быть null
     private long y; //Значение поля должно быть больше -493
 
@@ -17,8 +16,6 @@ public class Coordinates implements Serializable, Validatable {
         this.x = x;
         this.y = y;
     }
-
-    public Coordinates(){}
 
     @Override
     public boolean validate(){
