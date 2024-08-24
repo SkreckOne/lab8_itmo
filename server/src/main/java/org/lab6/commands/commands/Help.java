@@ -25,7 +25,7 @@ public class Help extends Command  {
         ArrayList<Command> commandList = new ArrayList<>();
         for (Map.Entry<String, Command> entry : commandManager.getCommands().entrySet()) {
             if (!entry.getKey().equals("save")) {
-                commandList.add(entry.getValue());
+                commandList.add(entry.getValue().getObject());
             }
         }
         return new Response(Response.ResponseType.DEFAULT,true, "Справка по командам:", commandList);

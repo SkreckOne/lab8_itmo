@@ -20,16 +20,16 @@ public class Invoker {
         var commandsList = manager.getCommandsList();
 
         var command = request.getCommand();
+        System.out.println(command.getClass());
+        System.out.println(command.getObject());
         if (request.getRequestType() != Request.RequestType.LOCAL) {
             for (Command commandFromList : commandsList) {
-                if (commandFromList.getClass().isInstance(command)) {
+                if (commandFromList.getObject().getClass().isInstance(command)) {
                     command = commandFromList;
+                    System.out.println("command found");
                     break;
                 }
             }
-
-            if (command == null)
-                return new Response(Response.ResponseType.DEFAULT, true, "No such command: " + request.getCommand(), (PriorityQueue<Organization>) null);
             return command.apply(request.getArguments());
         }
         return new Response(Response.ResponseType.DEFAULT,true, "Была исполнена локальная команад");

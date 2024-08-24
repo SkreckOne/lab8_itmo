@@ -13,22 +13,22 @@ public class CommandManager {
 
     public CommandManager(CollectionManager collectionManager, Console console, UserManager userManager){
         this.commands = new LinkedHashMap<>();
-        commands.put("help", new Help(this));
+        commands.put("help", new LoginCommandProxy(new Help(this)));
         commands.put("exit", new Exit());
-        commands.put("add", new Add(console, collectionManager));
-        commands.put("show", new Show(console, collectionManager));
-        commands.put("clear", new Clear(console, collectionManager));
-        commands.put("info", new Info(console, collectionManager));
-        commands.put("remove_by_id", new RemoveById(console, collectionManager));
-        commands.put("update", new Update(console, collectionManager));
-        commands.put("remove_head", new RemoveHead(console, collectionManager));
-        commands.put("remove_lower", new RemoveLower(console, collectionManager));
-        commands.put("filter_greater_than_full_name", new FilterGreaterThanFullName(console, collectionManager));
-        commands.put("filter_less_than_full_name", new FilterLessThanFullName(console, collectionManager));
-        commands.put("print_descending", new PrintDescending(console, collectionManager));
+        commands.put("add",  new LoginCommandProxy(new Add(console, collectionManager)));
+        commands.put("show",  new LoginCommandProxy(new Show(console, collectionManager)));
+        commands.put("clear",  new LoginCommandProxy(new Clear(console, collectionManager)));
+        commands.put("info",  new LoginCommandProxy(new Info(console, collectionManager)));
+        commands.put("remove_by_id",  new LoginCommandProxy(new RemoveById(console, collectionManager)));
+        commands.put("update",  new LoginCommandProxy(new Update(console, collectionManager)));
+        commands.put("remove_head",  new LoginCommandProxy(new RemoveHead(console, collectionManager)));
+        commands.put("remove_lower",  new LoginCommandProxy(new RemoveLower(console, collectionManager)));
+        commands.put("filter_greater_than_full_name",  new LoginCommandProxy(new FilterGreaterThanFullName(console, collectionManager)));
+        commands.put("filter_less_than_full_name",  new LoginCommandProxy(new FilterLessThanFullName(console, collectionManager)));
+        commands.put("print_descending",  new LoginCommandProxy(new PrintDescending(console, collectionManager)));
         commands.put("history", new History());
         commands.put("save", new Save(console, collectionManager));
-        commands.put("set_creds", new SetCredentials());
+        commands.put("set_creds",  new LoginCommandProxy(new SetCredentials()));
         commands.put("logout", new Logout());
         commands.put("check_creds", new CheckCredentials());
         commands.put("login", new Login(console, userManager));

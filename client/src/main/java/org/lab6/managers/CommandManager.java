@@ -2,7 +2,7 @@ package org.lab6.managers;
 import common.console.StandardConsole;
 import common.utils.Command;
 import org.lab6.commands.commands.*;
-
+import org.lab6.commands.LoginRequiredProxy;
 import java.util.*;
 
 
@@ -12,19 +12,19 @@ public class CommandManager {
 
     public CommandManager(){
         this.commands = new LinkedHashMap<>();
-        commands.put("help", new Help());
+        commands.put("help", new LoginRequiredProxy(new Help()));
         commands.put("exit", new Exit());
-        commands.put("add", new Add());
-        commands.put("show", new Show());
-        commands.put("clear", new Clear());
-        commands.put("info", new Info());
-        commands.put("remove_by_id", new RemoveById());
-        commands.put("update", new Update());
-        commands.put("remove_head", new RemoveHead());
-        commands.put("remove_lower", new RemoveLower());
-        commands.put("filter_greater_than_full_name", new FilterGreaterThanFullName());
-        commands.put("filter_less_than_full_name", new FilterLessThanFullName());
-        commands.put("print_descending", new PrintDescending());
+        commands.put("add", new LoginRequiredProxy(new Add()));
+        commands.put("show", new LoginRequiredProxy(new Show()));
+        commands.put("clear", new LoginRequiredProxy(new Clear()));
+        commands.put("info", new LoginRequiredProxy(new Info()));
+        commands.put("remove_by_id", new LoginRequiredProxy(new RemoveById()));
+        commands.put("update", new LoginRequiredProxy(new Update()));
+        commands.put("remove_head", new LoginRequiredProxy(new RemoveHead()));
+        commands.put("remove_lower", new LoginRequiredProxy(new RemoveLower()));
+        commands.put("filter_greater_than_full_name", new LoginRequiredProxy(new FilterGreaterThanFullName()));
+        commands.put("filter_less_than_full_name", new LoginRequiredProxy(new FilterLessThanFullName()));
+        commands.put("print_descending", new LoginRequiredProxy(new PrintDescending()));
         commands.put("history", new History());
         commands.put("execute_script", new ExecuteScript(new StandardConsole()));
         commands.put("set_creds", new SetCredentials(new StandardConsole()));

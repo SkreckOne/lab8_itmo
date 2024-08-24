@@ -47,4 +47,7 @@ public abstract class Command implements Serializable {
     public abstract ArrayList<ArgumentType> getArgumentType();
 
     public abstract Response apply(Map<ArgumentType, Object> args);
+    public Command getObject() {
+        return this;
+    }
 }

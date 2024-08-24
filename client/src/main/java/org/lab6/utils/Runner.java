@@ -3,6 +3,7 @@ package org.lab6.utils;
 import common.exceptions.ScriptRecursionException;
 import common.transfer.Session;
 import org.lab6.Client;
+import org.lab6.commands.LoginRequiredProxy;
 import org.lab6.managers.CommandManager;
 import org.lab6.managers.ResponseHandler;
 import common.console.Console;
@@ -190,7 +191,7 @@ public class Runner {
                     console.printError(e.getMessage());
                     return ExitCode.ERROR;
                 }
-                Response response = client.sendAndReceiveCommand(new Request(Request.RequestType.DEFAULT, command, args));
+                Response response = client.sendAndReceiveCommand(new Request(Request.RequestType.DEFAULT, command.getObject(), args));
                 if (response == null || !response.isSuccess()) {
                     console.printError(response != null ? response.getMessage() : "Не удалось получить ответ от сервера");
                     return ExitCode.ERROR;
