@@ -5,7 +5,7 @@ import common.models.Organization;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class Add extends Command {
             if (!organization.validate()) {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля организации не валидны! Организация не создана!");
             }
-            boolean success = collectionManager.add(organization);
+            boolean success = true; //collectionManager.add(organization);
             if (success)
                 return new Response(Response.ResponseType.DEFAULT,success, "Организация успешно добавлена!");
             else

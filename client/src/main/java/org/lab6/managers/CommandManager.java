@@ -27,6 +27,12 @@ public class CommandManager {
         commands.put("print_descending", new PrintDescending());
         commands.put("history", new History());
         commands.put("execute_script", new ExecuteScript(new StandardConsole()));
+        commands.put("set_creds", new SetCredentials(new StandardConsole()));
+        commands.put("logout", new Logout());
+        commands.put("check_creds", new CheckCredentials());
+        commands.put("login", new Login());
+        commands.put("register", new Register());
+
     }
 
     public Map<String, Command> getCommands() {

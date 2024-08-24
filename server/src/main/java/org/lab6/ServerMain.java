@@ -1,16 +1,16 @@
 package org.lab6;
 
 
-import common.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import common.console.*;
 
-import org.lab6.collection.CollectionManager;
-import org.lab6.collection.DatabaseManager;
+import org.lab6.managers.CollectionManager;
+import org.lab6.managers.DatabaseManager;
 import org.lab6.commands.CommandManager;
 import org.lab6.commands.Invoker;
+import org.lab6.managers.UserManager;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -29,21 +29,23 @@ public class ServerMain {
         var collectionManager = new CollectionManager(dbManager);
 
         if (!collectionManager.init()) { System.exit(1); }
-//        Runtime.getRuntime().addShutdownHook(new Thread(collectionManager::saveCollection));
-//        var commandManager = new CommandManager(collectionManager, console);
-//
-//        try {
-//            var server = new Server(PORT, new Invoker(commandManager));
-//            server.run();
-//        } catch (SocketException e) {
-//            logger.fatal("Случилась ошибка сокета", e);
-//        } catch (UnknownHostException e) {
-//            logger.fatal("Неизвестный хост", e);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        finally {
-//            dbManager.closeConnection();
-//        }
+        collectionManager.validateAll(console);
+        Runtime.getRuntime().addShutdownHook(new Thread(collectionManager::saveCollection));
+        var userManager = new UserManager(dbManager);
+        var commandManager = new CommandManager(collectionManager, console, userManager);
+
+        try {
+            var server = new Server(PORT, new Invoker(commandManager));
+            server.run();
+        } catch (SocketException e) {
+            logger.fatal("Случилась ошибка сокета", e);
+        } catch (UnknownHostException e) {
+            logger.fatal("Неизвестный хост", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            dbManager.closeConnection();
+        }
     }
 }

@@ -123,7 +123,7 @@ public class InstanceFiller {
         return r;
     }
 
-    public static Organization fillOrganization(Console console, String username){
+    public static Organization fillOrganization(Console console, Integer userId){
         console.println("Создание организации.");
 
         String name;
@@ -173,6 +173,6 @@ public class InstanceFiller {
             }
         }
 
-        return new Organization(-1, name, coordinates, annualTurnover, fullname, type, postalAddress, username);
+        return new Organization(name, coordinates, annualTurnover, fullname, type, postalAddress, userId);
     }
 }

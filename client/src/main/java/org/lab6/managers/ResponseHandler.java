@@ -4,11 +4,12 @@ package org.lab6.managers;
 import common.console.Console;
 import common.models.Organization;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.Command;
 
 public class ResponseHandler {
 
-    public void handle(Console console, Response response) {
+    public void handle(Console console, Response response, Session session) {
         if (response.isSuccess()) {
             if (response.getMessage() != null) console.println(response.getMessage());
 
@@ -23,6 +24,11 @@ public class ResponseHandler {
                     console.println(command.getName() + " " + command.getDescr());
                 }
             }
+
+            if (response.getSession() != null){
+                session.setUserId(response.getSession().getUserId());
+            }
+
         } else {
             console.printError(response.getMessage());
         }

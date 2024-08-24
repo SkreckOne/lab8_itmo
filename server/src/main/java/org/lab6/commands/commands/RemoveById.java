@@ -4,7 +4,7 @@ import common.console.Console;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,8 @@ public class RemoveById extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         int id = (int) args.get(ArgumentType.ID);
-        var res = collectionManager.remove(id);
+//        var res = collectionManager.remove(id);
+        var res = true;
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.");
         else

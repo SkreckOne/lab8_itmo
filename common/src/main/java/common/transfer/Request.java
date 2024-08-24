@@ -25,7 +25,7 @@ public class Request implements Serializable {
     private String username;
     private String password;
 
-    public Request(RequestType requestType, Command command, Map<ArgumentType, Object> args, String username, String password) {
+    public Request(RequestType requestType, Command command, Session session, Map<ArgumentType, Object> args) {
         this.requestType = requestType;
         this.command = command;
         this.args = args;

@@ -1,9 +1,8 @@
-package org.lab6.collection;
+package org.lab6.managers;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Properties;
 
@@ -114,31 +113,31 @@ public class DatabaseManager {
             for (int i = 0; i < 4; i++){
                 PreparedStatement statement = connection.prepareStatement(requests[i], Statement.RETURN_GENERATED_KEYS);
                 switch (i){
-                    case 0:
+                    case 0 -> {
                         statement.setString(1, organization.getName());
                         statement.setLong(2, organization.getAnnualTurnover());
                         statement.setString(3, organization.getFullName());
                         statement.setString(4, organization.getType().name());
                         statement.setInt(5, organization.getId());
-                        break;
+                    }
 
-                    case 1:
+                    case 1 -> {
                         statement.setInt(1, organization.getCoordinates().getX());
                         statement.setLong(2, organization.getCoordinates().getY());
                         statement.setInt(3, organization.getId());
-                        break;
+                    }
 
-                    case 2:
+                    case 2 -> {
                         statement.setString(1, organization.getPostalAddress().getZipCode());
                         statement.setInt(2, organization.getId());
-                        break;
+                    }
 
-                    case 3:
+                    case 3 -> {
                         statement.setLong(1, organization.getPostalAddress().getTown().getX());
                         statement.setLong(2, organization.getPostalAddress().getTown().getY());
                         statement.setLong(3, organization.getPostalAddress().getTown().getZ());
                         statement.setInt(4, organization.getId());
-                        break;
+                    }
 
                 }
                 status = statement.executeUpdate();
@@ -168,23 +167,22 @@ public class DatabaseManager {
             for (int i = 0; i < 4; i++){
                 PreparedStatement statement = connection.prepareStatement(requests[i], Statement.RETURN_GENERATED_KEYS);
                 switch (i){
-                    case 0:
+                    case 0 -> {
                         statement.setLong(1, organization.getPostalAddress().getTown().getX());
                         statement.setLong(2, organization.getPostalAddress().getTown().getY());
                         statement.setLong(3, organization.getPostalAddress().getTown().getZ());
-                        break;
+                    }
 
-                    case 1:
+                    case 1 -> {
                         statement.setString(1, organization.getPostalAddress().getZipCode());
                         statement.setInt(2, ids[0]);
-                        break;
+                    }
 
-                    case 2:
+                    case 2 -> {
                         statement.setInt(1, organization.getCoordinates().getX());
                         statement.setLong(2, organization.getCoordinates().getY());
-                        break;
-
-                    case 3:
+                    }
+                    case 3 -> {
                         statement.setInt(1, ids[1]);
                         statement.setInt(2, organization.getOwnerId());
                         statement.setInt(3, ids[2]);
@@ -192,7 +190,7 @@ public class DatabaseManager {
                         statement.setString(5, organization.getName());
                         statement.setLong(6, organization.getAnnualTurnover());
                         statement.setString(7, organization.getFullName());
-                        break;
+                    }
                 }
                 status = statement.executeUpdate();
                 if (status == 0){ console.printError("Object was not updated.\n"); return false;}
@@ -209,30 +207,31 @@ public class DatabaseManager {
         return true;
     }
 
-    public Boolean checkIfUserLoggedIn(String username, String password){
-        final String checkReq = "SELECT salt,password FROM lab7.User WHERE username = ? LIMIT 1";
+    public Integer getUserIdIfExist(String username, String password){
+        final String checkReq = "SELECT salt,password,user_id FROM lab7.User WHERE username = ? LIMIT 1";
+        Integer user_id = null;
         try (PreparedStatement creds = connection.prepareStatement(checkReq)){
             creds.setString(1, username);
             ResultSet result = creds.executeQuery();
             if (!result.isBeforeFirst() ) {
-                return false;
+                return null;
             }
             result.next();
             String passwordHash = PasswordManager.hashPassword(password, result.getString("salt"));
             String storedPasswordHash = result.getString("password");
-            System.out.println(passwordHash);
-            System.out.println(storedPasswordHash);
 
             if (!storedPasswordHash.equals(passwordHash)){
-                return false;
+                return null;
             }
+            user_id = result.getInt("user_id");
             result.close();
 
         } catch (SQLException e){
             console.printError(e);
         }
-        return true;
+        return user_id;
     }
+
 
     public Boolean addUser(String username, String password){
         final String addUsrReq = "INSERT INTO lab7.User (username, password, salt) VALUES (?, ?, ?)";

@@ -5,7 +5,7 @@ import common.models.Organization;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -33,8 +33,8 @@ public class Update extends Command {
             Organization d = (Organization) args.get(ArgumentType.ORGANIZATION);
             d.setId(id);
             if (d.validate()) {
-                collectionManager.remove(old.getId());
-                collectionManager.add(d);
+//                collectionManager.remove(old.getId());
+//                collectionManager.add(d);
                 return new Response(Response.ResponseType.DEFAULT,true, null);
             } else {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля не валидны! Организация не создана");

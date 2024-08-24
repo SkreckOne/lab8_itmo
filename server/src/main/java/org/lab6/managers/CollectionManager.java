@@ -1,4 +1,4 @@
-package org.lab6.collection;
+package org.lab6.managers;
 
 
 import common.console.Console;
@@ -6,8 +6,6 @@ import common.models.Organization;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
@@ -60,11 +58,11 @@ public class CollectionManager {
                 .orElse(null);
     }
 
-    public boolean add(Organization organization) {
-        if (contains(organization)) return false;
-        collection.add(organization);
-        return true;
-    }
+//    public boolean add(Organization organization) {
+//        if (contains(organization)) return false;
+//        collection.add(organization);
+//        return true;
+//    }
 
     public boolean contains(Organization organization) {
         return organization == null || getById(organization.getId()) != null || getByFullname(organization.getFullName()) != null;
@@ -75,9 +73,9 @@ public class CollectionManager {
         lastSaveTime = LocalDateTime.now();
     }
 
-    public void clear() {
-        collection.clear();
-    }
+//    public void clear() {
+//        collection.clear();
+//    }
 
     public PriorityQueue<Organization> getCollection() {
         return collection;
@@ -92,12 +90,12 @@ public class CollectionManager {
         return collection.size();
     }
 
-    public boolean remove(long id) {
-        Organization orgToRem = getById(id);
-        if (orgToRem == null) return false;
-        collection.remove(orgToRem);
-        return true;
-    }
+//    public boolean remove(long id) {
+//        Organization orgToRem = getById(id);
+//        if (orgToRem == null) return false;
+//        collection.remove(orgToRem);
+//        return true;
+//    }
 
     public Organization getFirstElement() {
         return collection.stream()
@@ -105,9 +103,9 @@ public class CollectionManager {
                 .orElse(null);
     }
 
-    public boolean removeLower(Organization organization) {
-        return collection.removeIf(org -> (org.compareTo(organization) < 0));
-    }
+//    public boolean removeLower(Organization organization) {
+//        return collection.removeIf(org -> (org.compareTo(organization) < 0));
+//    }
 
     public PriorityQueue<Organization> getGreaterThan(String fullname) {
         return collection.stream()

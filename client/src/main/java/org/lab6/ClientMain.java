@@ -19,7 +19,7 @@ public class ClientMain {
         var console = new StandardConsole();
         try {
             var client = new Client(InetAddress.getByName("127.0.0.1"), PORT);
-            new Runner(console, client);
+            new Runner(console, client).interactiveMode();
             client.close();
         } catch (ConnectException e) {
             logger.error("Сервер недоступен");

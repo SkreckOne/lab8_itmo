@@ -7,4 +7,5 @@ public enum ArgumentType implements Serializable {
     ORGANIZATION,
     SCRIPT_NAME,
     FULLNAME,
+    SESSION,
 }

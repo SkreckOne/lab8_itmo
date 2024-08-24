@@ -5,7 +5,7 @@ import common.models.Organization;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 
 import java.util.*;
 
@@ -24,7 +24,8 @@ public class RemoveLower extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
-        var res = collectionManager.removeLower(organization);
+//        var res = collectionManager.removeLower(organization);
+        var res = true;
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организации успешно удалены.");
         else

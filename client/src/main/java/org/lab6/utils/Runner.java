@@ -1,6 +1,7 @@
 package org.lab6.utils;
 
 import common.exceptions.ScriptRecursionException;
+import common.transfer.Session;
 import org.lab6.Client;
 import org.lab6.managers.CommandManager;
 import org.lab6.managers.ResponseHandler;
@@ -29,7 +30,7 @@ public class Runner {
     private final CommandManager commandManager;
     private final ResponseHandler responseHandler;
     private final List<String> scriptStack = new ArrayList<>();
-    private String username;
+    private Session session = null;
 
     public Runner(Console console, Client client) throws IOException, ClassNotFoundException {
         this.client = client;
@@ -125,10 +126,13 @@ public class Runner {
                     }
                     break;
                 case ORGANIZATION:
-                    args.put(ArgumentType.ORGANIZATION, InstanceFiller.fillOrganization(console, username));
+                    args.put(ArgumentType.ORGANIZATION, InstanceFiller.fillOrganization(console, session.getUserId()));
                     break;
                 case SCRIPT_NAME:
                     args.put(ArgumentType.SCRIPT_NAME, userCommand[1]);
+                    break;
+                case SESSION:
+                    args.put(ArgumentType.SESSION, session);
                     break;
                 case FULLNAME:
                     args.put(ArgumentType.FULLNAME, userCommand[1]);
@@ -160,6 +164,24 @@ public class Runner {
                 if (!commandManager.getCommands().get("execute_script").apply(new HashMap<>()).isSuccess()) return ExitCode.ERROR;
                 else return scriptMode(userCommand[1]);
             }
+            case "set_creds" ->{
+                session =  commandManager.getCommands().get("set_creds").apply(new HashMap<>()).getSession();
+                console.println("Session saved.");
+                return ExitCode.OK;
+            }
+            case "logout" -> {
+                session = null;
+                console.println("Logged out successfully.");
+                return  ExitCode.OK;
+            }
+            case "check_creds" ->{
+                if (session == null){console.println("Session hasn't setted up yet. Use set_creds command to do so.");}
+                else {
+                    console.println("Username: " + session.getUsername());
+                    console.println("Password: " + session.getPassword());
+                    if (session.getUserId() != null){console.println("UserID: " + session.getUserId());}
+                }
+            }
             default -> {
                 Map<ArgumentType, Object> args;
                 try {
@@ -173,7 +195,7 @@ public class Runner {
                     console.printError(response != null ? response.getMessage() : "Не удалось получить ответ от сервера");
                     return ExitCode.ERROR;
                 }
-                responseHandler.handle(console, response);
+                responseHandler.handle(console, response, session);
             }
         }
 

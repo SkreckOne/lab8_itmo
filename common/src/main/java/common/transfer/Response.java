@@ -19,6 +19,7 @@ public class Response implements Serializable {
     private final PriorityQueue<Organization> organizations;
     private final ArrayList<Command> commands;
     private final ResponseType responseType;
+    private final Session session;
 
     public Response(ResponseType responseType,boolean success, String message, PriorityQueue<Organization> organizations) {
         this.success = success;
@@ -26,13 +27,16 @@ public class Response implements Serializable {
         this.organizations = organizations;
         this.commands = null;
         this.responseType = responseType;
+        this.session = null;
     }
+
     public Response(ResponseType responseType, boolean success, String message, ArrayList<Command> commands) {
         this.success = success;
         this.message = message;
         this.organizations = null;
         this.commands = commands;
         this.responseType = responseType;
+        this.session = null;
     }
 
     public Response(ResponseType responseType, boolean success, String message) {
@@ -41,6 +45,16 @@ public class Response implements Serializable {
         this.organizations = null;
         this.commands = null;
         this.responseType = responseType;
+        this.session = null;
+    }
+
+    public Response(ResponseType responseType, boolean success, String message, Session session) {
+        this.success = success;
+        this.message = message;
+        this.organizations = null;
+        this.commands = null;
+        this.responseType = responseType;
+        this.session = session;
     }
 
     public PriorityQueue<Organization> getOrganizations() {
@@ -50,6 +64,8 @@ public class Response implements Serializable {
     public String getMessage() {
         return message;
     }
+
+    public Session getSession(){return session;}
 
     public ResponseType getResponseType() {return this.responseType;}
 

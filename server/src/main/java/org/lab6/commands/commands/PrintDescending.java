@@ -4,10 +4,9 @@ import common.console.Console;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class PrintDescending extends Command {

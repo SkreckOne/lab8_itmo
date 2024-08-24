@@ -2,15 +2,16 @@ package org.lab6.commands;
 
 import common.console.Console;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 import org.lab6.commands.commands.*;
+import org.lab6.managers.UserManager;
 
 import java.util.*;
 
 public class CommandManager {
     private final Map<String, Command> commands;
 
-    public CommandManager(CollectionManager collectionManager, Console console){
+    public CommandManager(CollectionManager collectionManager, Console console, UserManager userManager){
         this.commands = new LinkedHashMap<>();
         commands.put("help", new Help(this));
         commands.put("exit", new Exit());
@@ -27,6 +28,11 @@ public class CommandManager {
         commands.put("print_descending", new PrintDescending(console, collectionManager));
         commands.put("history", new History());
         commands.put("save", new Save(console, collectionManager));
+        commands.put("set_creds", new SetCredentials());
+        commands.put("logout", new Logout());
+        commands.put("check_creds", new CheckCredentials());
+        commands.put("login", new Login(console, userManager));
+        commands.put("register", new Register(console, userManager));
     }
 
     public Map<String, Command> getCommands() {

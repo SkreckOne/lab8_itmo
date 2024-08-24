@@ -1,11 +1,10 @@
 package org.lab6.commands.commands;
 
 import common.console.Console;
-import common.models.Organization;
 import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
-import org.lab6.collection.CollectionManager;
+import org.lab6.managers.CollectionManager;
 
 import java.util.*;
 
@@ -27,7 +26,8 @@ public class RemoveHead extends Command {
         if (firstElement == null){
             return new Response(Response.ResponseType.DEFAULT,false, "Коллекция пуста.");
         }
-        var res = collectionManager.remove(firstElement.getId());
+        var res = true;
+//        var res = collectionManager.remove(firstElement.getId());
         return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.", new PriorityQueue<>(Collections.singletonList(firstElement)));
     }
     public ArrayList<ArgumentType> getArgumentType() {
