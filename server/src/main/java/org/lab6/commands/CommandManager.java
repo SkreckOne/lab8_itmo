@@ -13,7 +13,7 @@ public class CommandManager {
 
     public CommandManager(CollectionManager collectionManager, Console console, UserManager userManager){
         this.commands = new LinkedHashMap<>();
-        commands.put("help", new LoginCommandProxy(new Help(this)));
+        commands.put("help", new Help(this));
         commands.put("exit", new Exit());
         commands.put("add",  new LoginCommandProxy(new Add(console, collectionManager)));
         commands.put("show",  new LoginCommandProxy(new Show(console, collectionManager)));

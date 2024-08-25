@@ -24,8 +24,7 @@ public class RemoveLower extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
-//        var res = collectionManager.removeLower(organization);
-        var res = true;
+        var res = collectionManager.removeLower(organization);
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организации успешно удалены.");
         else

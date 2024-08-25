@@ -27,17 +27,21 @@ public class Add extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         try {
+            System.out.println("pass 1");
             Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
             if (!organization.validate()) {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля организации не валидны! Организация не создана!");
             }
-            boolean success = true; //collectionManager.add(organization);
+            System.out.println("pass 2");
+            boolean success = collectionManager.add(organization);
+            System.out.println("pass 3");
             if (success)
                 return new Response(Response.ResponseType.DEFAULT,success, "Организация успешно добавлена!");
             else
                 return new Response(Response.ResponseType.DEFAULT,success, "Полное имя не уникально!");
         } catch (Exception e) {
             console.printError(e.toString());
+            console.printError(e.fillInStackTrace());
             return new Response(Response.ResponseType.DEFAULT,false, e.toString());
         }
     }

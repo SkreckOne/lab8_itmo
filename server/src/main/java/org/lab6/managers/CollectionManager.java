@@ -5,8 +5,7 @@ import common.console.Console;
 import common.models.Organization;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CollectionManager {
@@ -58,14 +57,22 @@ public class CollectionManager {
                 .orElse(null);
     }
 
-//    public boolean add(Organization organization) {
-//        if (contains(organization)) return false;
-//        collection.add(organization);
-//        return true;
-//    }
+    public boolean add(Organization organization) {
+        System.out.println(contains(organization));
+        System.out.println(getByFullname(organization.getFullName()));
+        if (contains(organization)) return false;
+        if (dbManager.writerProvider(organization)){
+            Map<String, Object> data = dbManager.getIdAndDate(organization.getFullName());
+            organization.setCreationDate((Date) data.get("creation_date"));
+            organization.setId((Integer) data.get("organisation_id"));
+            collection.add(organization);
+            return true;
+        }else{return false;}
+
+    }
 
     public boolean contains(Organization organization) {
-        return organization == null || getById(organization.getId()) != null || getByFullname(organization.getFullName()) != null;
+        return organization == null || getByFullname(organization.getFullName()) != null;
     }
 
     public void saveCollection() {
@@ -73,9 +80,9 @@ public class CollectionManager {
         lastSaveTime = LocalDateTime.now();
     }
 
-//    public void clear() {
-//        collection.clear();
-//    }
+    public void clear(Integer id) {
+        collection.removeIf(organization -> (organization.getOwnerId() == id && dbManager.deleteOrganization(organization)));
+    }
 
     public PriorityQueue<Organization> getCollection() {
         return collection;
@@ -90,22 +97,20 @@ public class CollectionManager {
         return collection.size();
     }
 
-//    public boolean remove(long id) {
-//        Organization orgToRem = getById(id);
-//        if (orgToRem == null) return false;
-//        collection.remove(orgToRem);
-//        return true;
-//    }
+    public boolean remove(long id, int userId) {
+        Organization orgToRem = getById(id);
+        if (orgToRem == null) return false;
 
-    public Organization getFirstElement() {
-        return collection.stream()
-                .min(Organization::compareTo)
-                .orElse(null);
+        return collection.removeIf(org -> org.equals(orgToRem) && org.getOwnerId()==userId && dbManager.deleteOrganization(org));
     }
 
-//    public boolean removeLower(Organization organization) {
-//        return collection.removeIf(org -> (org.compareTo(organization) < 0));
-//    }
+    public Organization getFirstElement(int user_id) {
+        return collection.stream().filter(organization -> organization.getOwnerId() == user_id).findFirst().orElse(null);
+    }
+
+    public boolean removeLower(Organization organization) {
+        return collection.removeIf(org -> (org.compareTo(organization) < 0 && org.getOwnerId()==organization.getOwnerId() && dbManager.deleteOrganization(org)));
+    }
 
     public PriorityQueue<Organization> getGreaterThan(String fullname) {
         return collection.stream()

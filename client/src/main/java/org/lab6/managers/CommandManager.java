@@ -12,7 +12,7 @@ public class CommandManager {
 
     public CommandManager(){
         this.commands = new LinkedHashMap<>();
-        commands.put("help", new LoginRequiredProxy(new Help()));
+        commands.put("help", new Help());
         commands.put("exit", new Exit());
         commands.put("add", new LoginRequiredProxy(new Add()));
         commands.put("show", new LoginRequiredProxy(new Show()));

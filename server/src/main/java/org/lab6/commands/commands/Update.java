@@ -3,6 +3,7 @@ package org.lab6.commands.commands;
 import common.console.Console;
 import common.models.Organization;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.lab6.managers.CollectionManager;
@@ -30,11 +31,13 @@ public class Update extends Command {
             if (old == null || !collectionManager.getCollection().contains(old)) {
                 return new Response(Response.ResponseType.DEFAULT,false, "Передан несуществующий ID!");
             }
+
+            Session session = (Session) args.get(ArgumentType.SESSION);
+            if (old.getOwnerId() != session.getUserId()){return new Response(Response.ResponseType.DEFAULT,false, "Это не ваша организация");}
             Organization d = (Organization) args.get(ArgumentType.ORGANIZATION);
             d.setId(id);
             if (d.validate()) {
-//                collectionManager.remove(old.getId());
-//                collectionManager.add(d);
+                collectionManager.add(d);
                 return new Response(Response.ResponseType.DEFAULT,true, null);
             } else {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля не валидны! Организация не создана");

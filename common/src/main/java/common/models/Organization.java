@@ -46,10 +46,8 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
 
     @Override
     public boolean validate(){
-        if (id <= 0) return false;
         if (name == null || name.isEmpty()) return false;
         if (coordinates == null || !coordinates.validate()) return false;
-        if (creationDate == null) return false;
         if (annualTurnover == null || annualTurnover <= 0) return false;
         if (fullName == null || fullName.length() >= 1322) return false;
         if (type == null) return false;

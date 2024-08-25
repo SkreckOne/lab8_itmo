@@ -2,6 +2,7 @@ package org.lab6.commands.commands;
 
 import common.console.Console;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.lab6.managers.CollectionManager;
@@ -24,8 +25,8 @@ public class RemoveById extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         int id = (int) args.get(ArgumentType.ID);
-//        var res = collectionManager.remove(id);
-        var res = true;
+        Session session = (Session) args.get(ArgumentType.SESSION);
+        var res = collectionManager.remove(id, session.getUserId());
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.");
         else

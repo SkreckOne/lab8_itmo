@@ -3,8 +3,8 @@ package org.lab6.managers;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.util.PriorityQueue;
-import java.util.Properties;
+import java.sql.Date;
+import java.util.*;
 
 import common.console.Console;
 import common.models.*;
@@ -66,11 +66,33 @@ public class DatabaseManager {
         organizations.stream().forEach(this::writerProvider);
     }
 
+    public Map<String, Object> getIdAndDate(String fullName) {
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        final String query = "SELECT organisation_id, creation_date FROM lab7.Organisation WHERE full_name = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, fullName);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    resultMap.put("organisation_id", resultSet.getInt("organisation_id"));
+                    resultMap.put("creation_date", resultSet.getDate("creation_date"));
+                }
+            }
+        } catch (SQLException e) {
+            console.printError(e);
+        }
+
+        return resultMap;
+    }
+
     public boolean deleteOrganization(Organization organization){
         final String request = "DELETE FROM lab7.Organisation WHERE organisation_id = ?";
+
         try (PreparedStatement statement = connection.prepareStatement(request)){
+            console.println("Rem org step 1: " + organization.getId());
             statement.setInt(1, organization.getId());
             int status = statement.executeUpdate();
+            console.println("Rem org status: " + status);
             if (status == 0){console.printError("Object was not removed\n"); return false;}
             connection.commit();
         }catch (SQLException e){
@@ -109,6 +131,7 @@ public class DatabaseManager {
 
         };
         int status;
+        console.println("Trying to update organization: " + organization.getFullName());
         try{
             for (int i = 0; i < 4; i++){
                 PreparedStatement statement = connection.prepareStatement(requests[i], Statement.RETURN_GENERATED_KEYS);
@@ -143,6 +166,7 @@ public class DatabaseManager {
                 status = statement.executeUpdate();
                 if (status == 0){console.printError("Object was not updated.\n"); return false;}
                 statement.close();
+                connection.commit();
             }
         } catch (SQLException e){
             new SqlExceptionHandler(console).handleSqlException(e, connection);
@@ -162,6 +186,7 @@ public class DatabaseManager {
         int[] ids = new int[4];
         int status;
         ResultSet generatedKeys;
+        console.println("Trying to write organization: " + organization.getFullName());
 
         try{
             for (int i = 0; i < 4; i++){

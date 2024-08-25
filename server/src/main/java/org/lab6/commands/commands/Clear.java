@@ -2,9 +2,11 @@ package org.lab6.commands.commands;
 
 import common.console.Console;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.apache.logging.log4j.Logger;
+import org.lab6.Server;
 import org.lab6.ServerMain;
 import org.lab6.managers.CollectionManager;
 
@@ -26,7 +28,9 @@ public class Clear extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         try {
-//            collectionManager.clear();
+            Session session = (Session) args.get(ArgumentType.SESSION);
+            console.println(session.getUserId());
+            collectionManager.clear(session.getUserId());
             return new Response(Response.ResponseType.DEFAULT,true, "Коллекция очищена.");
         } catch (Exception e) {
             return new Response(Response.ResponseType.DEFAULT,false, "Ошибка при очистке коллекции!");

@@ -2,6 +2,7 @@ package org.lab6.commands.commands;
 
 import common.console.Console;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.lab6.managers.CollectionManager;
@@ -22,12 +23,12 @@ public class RemoveHead extends Command {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        var firstElement = collectionManager.getFirstElement();
+        Session session = (Session) args.get(ArgumentType.SESSION);
+        var firstElement = collectionManager.getFirstElement(session.getUserId());
         if (firstElement == null){
             return new Response(Response.ResponseType.DEFAULT,false, "Коллекция пуста.");
         }
-        var res = true;
-//        var res = collectionManager.remove(firstElement.getId());
+        var res = collectionManager.remove(firstElement.getId(), session.getUserId());
         return new Response(Response.ResponseType.DEFAULT,res, "Организация успешно удалена.", new PriorityQueue<>(Collections.singletonList(firstElement)));
     }
     public ArrayList<ArgumentType> getArgumentType() {
