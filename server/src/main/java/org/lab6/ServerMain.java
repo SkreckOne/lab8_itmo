@@ -17,14 +17,23 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class ServerMain {
-    public static final int PORT = 2222;
+    public static final int PORT = 9999;
 
     public static Logger logger = LogManager.getLogger("ServerLogger");
 
     public static void main(String[] args) {
         Console console = new StandardConsole();
+        int PORT = 6666;
+        if (args.length != 0) {
+            try {
+                PORT = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println("Port must be an integer.");
+                System.exit(1);
+            }
+        }
 
-        var dbManager = new DatabaseManager("jdbc:postgresql://localhost:5432/mydatabase", console);
+        var dbManager = new DatabaseManager(console);
         dbManager.connect();
         var collectionManager = new CollectionManager(dbManager);
 

@@ -10,8 +10,6 @@ public class StandardConsole implements Console {
     private static Scanner fileScanner = null;
     private static Scanner defScanner = new Scanner(System.in);
 
-    private FileOutputStream fileOutputStream;
-
 
     @Override
     public void print(Object obj) {
@@ -39,18 +37,6 @@ public class StandardConsole implements Console {
     @Override
     public void prompt() {
         print(PROMPT);
-    }
-
-
-    @Override
-    public String getPrompt() {
-        return PROMPT;
-    }
-
-
-    @Override
-    public void selectFileScanner(Scanner scanner) {
-        this.fileScanner = scanner;
     }
 
 

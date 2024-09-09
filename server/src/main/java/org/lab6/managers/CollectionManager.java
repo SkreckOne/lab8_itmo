@@ -1,15 +1,17 @@
 package org.lab6.managers;
 
-
 import common.console.Console;
 import common.models.Organization;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 public class CollectionManager {
     private final PriorityQueue<Organization> collection = new PriorityQueue<>();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();  // Add a ReadWriteLock
 
     private final DatabaseManager dbManager;
     private LocalDateTime lastInitTime;
@@ -20,113 +22,214 @@ public class CollectionManager {
     }
 
     public LocalDateTime getLastInitTime() {
-        return lastInitTime;
+        lock.readLock().lock();
+        try {
+            return lastInitTime;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public LocalDateTime getLastSaveTime() {
-        return lastSaveTime;
+        lock.readLock().lock();
+        try {
+            return lastSaveTime;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void validateAll(Console console) {
-        collection.forEach(organization -> {
-            if (!organization.validate()) {
-                console.printError("Дракон с id=" + organization.getId() + " имеет невалидные поля.");
-            }
-        });
-        console.println("Выполнена проверка корректности загруженных данных");
+        lock.readLock().lock();
+        try {
+            collection.forEach(organization -> {
+                if (!organization.validate()) {
+                    console.printError("Organization with id=" + organization.getId() + " has invalid fields.");
+                }
+            });
+            console.println("Completed validation of loaded data.");
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean init() {
-        collection.clear();
-        dbManager.readCollection(collection);
-        lastInitTime = LocalDateTime.now();
-        return true;
+        lock.writeLock().lock();
+        try {
+            collection.clear();
+            dbManager.readCollection(collection);
+            lastInitTime = LocalDateTime.now();
+            return true;
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public Organization getById(long id) {
-        return collection.stream()
-                .filter(organization -> organization.getId() == id)
-                .findFirst()
-                .orElse(null);
+        lock.readLock().lock();
+        try {
+            return collection.stream()
+                    .filter(organization -> organization.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public Organization getByFullname(String fullname) {
-        return collection.stream()
-                .filter(organization -> organization.getFullName().equals(fullname))
-                .findFirst()
-                .orElse(null);
+        lock.readLock().lock();
+        try {
+            return collection.stream()
+                    .filter(organization -> organization.getFullName().equals(fullname))
+                    .findFirst()
+                    .orElse(null);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean add(Organization organization) {
-        System.out.println(contains(organization));
-        System.out.println(getByFullname(organization.getFullName()));
-        if (contains(organization)) return false;
-        if (dbManager.writerProvider(organization)){
-            Map<String, Object> data = dbManager.getIdAndDate(organization.getFullName());
-            organization.setCreationDate((Date) data.get("creation_date"));
-            organization.setId((Integer) data.get("organisation_id"));
-            collection.add(organization);
-            return true;
-        }else{return false;}
-
+        lock.writeLock().lock();
+        try {
+            if (checkIfContain(organization)) return false;
+            if (dbManager.writerProvider(organization)) {
+                Map<String, Object> data = dbManager.getIdAndDate(organization.getFullName());
+                organization.setCreationDate((Date) data.get("creation_date"));
+                organization.setId((Integer) data.get("organisation_id"));
+                collection.add(organization);
+                return true;
+            } else {
+                return false;
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    public boolean contains(Organization organization) {
-        return organization == null || getByFullname(organization.getFullName()) != null;
+    public boolean checkIfContain(Organization organization) {
+        lock.readLock().lock();
+        try {
+            return organization == null || getByFullname(organization.getFullName()) != null;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void saveCollection() {
-        dbManager.writeCollection(collection);
-        lastSaveTime = LocalDateTime.now();
+        lock.writeLock().lock();
+        try {
+            dbManager.writeCollection(collection);
+            lastSaveTime = LocalDateTime.now();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
-
     public void clear(Integer id) {
-        collection.removeIf(organization -> (organization.getOwnerId() == id && dbManager.deleteOrganization(organization)));
+        lock.writeLock().lock();
+        try {
+            collection.removeIf(organization ->
+                    (organization.getOwnerId() == id && dbManager.deleteOrganization(organization))
+            );
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public PriorityQueue<Organization> getCollection() {
-        return collection;
+        lock.readLock().lock();
+        try {
+            return new PriorityQueue<>(collection);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-
     public String collectionType() {
-        return collection.getClass().getName();
+        lock.readLock().lock();
+        try {
+            return collection.getClass().getName();
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public long collectionSize() {
-        return collection.size();
+        lock.readLock().lock();
+        try {
+            return collection.size();
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean remove(long id, int userId) {
-        Organization orgToRem = getById(id);
-        if (orgToRem == null) return false;
+        lock.writeLock().lock();
+        try {
+            Organization orgToRem = getById(id);
+            if (orgToRem == null) return false;
 
-        return collection.removeIf(org -> org.equals(orgToRem) && org.getOwnerId()==userId && dbManager.deleteOrganization(org));
+            return collection.removeIf(org ->
+                    org.equals(orgToRem) && org.getOwnerId() == userId && dbManager.deleteOrganization(org)
+            );
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    public Organization getFirstElement(int user_id) {
-        return collection.stream().filter(organization -> organization.getOwnerId() == user_id).findFirst().orElse(null);
+    public Organization getFirstElement(int userId) {
+        lock.readLock().lock();
+        try {
+            return collection.stream()
+                    .filter(organization -> organization.getOwnerId() == userId)
+                    .findFirst()
+                    .orElse(null);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean removeLower(Organization organization) {
-        return collection.removeIf(org -> (org.compareTo(organization) < 0 && org.getOwnerId()==organization.getOwnerId() && dbManager.deleteOrganization(org)));
+        lock.writeLock().lock();
+        try {
+            return collection.removeIf(org ->
+                    (org.compareTo(organization) < 0 && org.getOwnerId() == organization.getOwnerId() && dbManager.deleteOrganization(org))
+            );
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public PriorityQueue<Organization> getGreaterThan(String fullname) {
-        return collection.stream()
-                .filter(organization -> organization.getFullName().compareTo(fullname) > 0)
-                .collect(Collectors.toCollection(PriorityQueue::new));
+        lock.readLock().lock();
+        try {
+            return collection.stream()
+                    .filter(organization -> organization.getFullName().compareTo(fullname) > 0)
+                    .collect(Collectors.toCollection(PriorityQueue::new));
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public PriorityQueue<Organization> lowerGreaterThan(String fullname) {
-        return collection.stream()
-                .filter(organization -> organization.getFullName().compareTo(fullname) < 0)
-                .collect(Collectors.toCollection(PriorityQueue::new));
+        lock.readLock().lock();
+        try {
+            return collection.stream()
+                    .filter(organization -> organization.getFullName().compareTo(fullname) < 0)
+                    .collect(Collectors.toCollection(PriorityQueue::new));
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public PriorityQueue<Organization> getCollectionDescending() {
-        Comparator<Organization> reversedComparator = Comparator.reverseOrder();
-        return collection.stream()
-                .collect(Collectors.toCollection(() -> new PriorityQueue<>(reversedComparator)));
+        lock.readLock().lock();
+        try {
+            Comparator<Organization> reversedComparator = Comparator.reverseOrder();
+            return collection.stream()
+                    .collect(Collectors.toCollection(() -> new PriorityQueue<>(reversedComparator)));
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 }

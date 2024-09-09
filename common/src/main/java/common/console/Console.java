@@ -11,7 +11,5 @@ public interface Console {
     String readln();
     void printError(Object obj);
     void prompt();
-    String getPrompt();
-    void selectFileScanner(Scanner obj);
     void selectConsoleScanner();
 }

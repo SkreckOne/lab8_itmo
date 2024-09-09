@@ -70,8 +70,6 @@ public class Runner {
         scriptStack.add(argument);
         try (Scanner scriptScanner = new Scanner(new File(argument))) {
             if (!scriptScanner.hasNext()) throw new NoSuchElementException();
-            console.selectFileScanner(scriptScanner);
-
             do {
                 userCommand = (scriptScanner.nextLine().trim() + " ").split(" ", 2);
                 userCommand[1] = userCommand[1].trim();
@@ -82,7 +80,6 @@ public class Runner {
                 if (userCommand[0].equals("execute_script")) {
                     for (String script : scriptStack) {
                         if (userCommand[1].equals(script)) {
-                            console.selectConsoleScanner();
                             throw new ScriptRecursionException();
                         }
                     }
@@ -153,6 +150,14 @@ public class Runner {
             return ExitCode.ERROR;
         }
 
+        Map<ArgumentType, Object> args;
+        try {
+            args = handleArguments(command.getArgumentType(), userCommand);
+        } catch (IllegalArgumentException e) {
+            console.printError(e.getMessage());
+            return ExitCode.ERROR;
+        }
+
         switch (userCommand[0]) {
             case "exit" -> {
                 return ExitCode.EXIT;
@@ -162,7 +167,7 @@ public class Runner {
                 return ExitCode.OK;
             }
             case "execute_script" -> {
-                if (!commandManager.getCommands().get("execute_script").apply(new HashMap<>()).isSuccess()) return ExitCode.ERROR;
+                if (!commandManager.getCommands().get("execute_script").apply(args).isSuccess()) return ExitCode.ERROR;
                 else return scriptMode(userCommand[1]);
             }
             case "set_creds" ->{
@@ -184,13 +189,6 @@ public class Runner {
                 }
             }
             default -> {
-                Map<ArgumentType, Object> args;
-                try {
-                    args = handleArguments(command.getArgumentType(), userCommand);
-                } catch (IllegalArgumentException e) {
-                    console.printError(e.getMessage());
-                    return ExitCode.ERROR;
-                }
                 Response response = client.sendAndReceiveCommand(new Request(Request.RequestType.DEFAULT, command.getObject(), args));
                 if (response == null || !response.isSuccess()) {
                     console.printError(response != null ? response.getMessage() : "Не удалось получить ответ от сервера");

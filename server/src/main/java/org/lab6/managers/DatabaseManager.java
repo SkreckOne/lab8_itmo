@@ -12,31 +12,29 @@ import org.lab6.utils.PasswordManager;
 import org.lab6.utils.SqlExceptionHandler;
 
 public class DatabaseManager {
-    final private String dbUrl;
+    private String dbUrl;
     private Connection connection;
     final private Console console;
 
-    public DatabaseManager(String dbUrl, Console console) {
-        this.dbUrl = dbUrl;
+    public DatabaseManager(Console console) {
         this.console = console;
     }
 
-    public void connect(){
+    public void connect() {
         try {
             Class.forName("org.postgresql.Driver");
             Properties info = new Properties();
             info.load(new FileInputStream("db.cfg"));
+            dbUrl = info.getProperty("url");
             connection = DriverManager.getConnection(dbUrl, info);
             connection.setAutoCommit(false);
         } catch (SQLException e) {
             console.printError(e.getMessage());
             console.printError("Connection failed.\n");
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             console.printError(e.getMessage());
-            console.printError("Configutation file failed to load.\n");
-        }
-        catch (ClassNotFoundException e){
+            console.printError("Configuration file failed to load.\n");
+        } catch (ClassNotFoundException e) {
             console.printError(e.getMessage());
             console.printError("DB driver not found.\n");
         }
@@ -44,9 +42,9 @@ public class DatabaseManager {
 
 
     public void readCollection(PriorityQueue<Organization> organizations){
-        final String request = "SELECT * FROM lab7.Organisation JOIN lab7.Address ON lab7.Organisation.address_id = lab7.Address.address_id" +
-                " JOIN lab7.Location ON lab7.Location.location_id = lab7.Address.town" +
-                " JOIN lab7.Coordinates ON lab7.Coordinates.coordinates_id = lab7.Organisation.coordinates_id";
+        final String request = "SELECT * FROM s409178.Organisation JOIN s409178.Address ON s409178.Organisation.address_id = s409178.Address.address_id" +
+                " JOIN s409178.Location ON s409178.Location.location_id = s409178.Address.town" +
+                " JOIN s409178.Coordinates ON s409178.Coordinates.coordinates_id = s409178.Organisation.coordinates_id";
         try (Statement data = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY); ResultSet resultSet = data.executeQuery(request)){
             while(resultSet.next()){
                 Location cLocation = new Location(resultSet.getLong("location_x"), resultSet.getLong("location_y"), resultSet.getLong("location_z"));
@@ -68,7 +66,7 @@ public class DatabaseManager {
 
     public Map<String, Object> getIdAndDate(String fullName) {
         Map<String, Object> resultMap = new LinkedHashMap<>();
-        final String query = "SELECT organisation_id, creation_date FROM lab7.Organisation WHERE full_name = ?";
+        final String query = "SELECT organisation_id, creation_date FROM s409178.Organisation WHERE full_name = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, fullName);
@@ -86,7 +84,7 @@ public class DatabaseManager {
     }
 
     public boolean deleteOrganization(Organization organization){
-        final String request = "DELETE FROM lab7.Organisation WHERE organisation_id = ?";
+        final String request = "DELETE FROM s409178.Organisation WHERE organisation_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(request)){
             console.println("Rem org step 1: " + organization.getId());
@@ -104,8 +102,8 @@ public class DatabaseManager {
 
     public boolean writerProvider(Organization organization){
         boolean answ = false;
-        final String existRequest = "SELECT EXISTS (SELECT 1 FROM lab7.Organisation JOIN lab7.Address ON lab7.Organisation.address_id = lab7.Address.address_id "+
-                "JOIN lab7.Location ON lab7.Location.location_id = lab7.Address.town WHERE lab7.Organisation.organisation_id = ?" +
+        final String existRequest = "SELECT EXISTS (SELECT 1 FROM s409178.Organisation JOIN s409178.Address ON s409178.Organisation.address_id = s409178.Address.address_id "+
+                "JOIN s409178.Location ON s409178.Location.location_id = s409178.Address.town WHERE s409178.Organisation.organisation_id = ?" +
                 ")";
         try (PreparedStatement status = connection.prepareStatement(existRequest);){
             status.setInt(1, organization.getId());
@@ -122,12 +120,12 @@ public class DatabaseManager {
 
     private boolean updateOrganization(Organization organization){
         final String[] requests = new String[]{
-                "UPDATE lab7.Organisation SET name = ?, annual_turnover = ?, full_name = ?, organisation_type = ?::lab7.organisationtype WHERE organisation_id = ?",
-                "UPDATE lab7.Coordinates SET coordinates_x = ?, coordinates_y = ? WHERE coordinates_id = (SELECT coordinates_id FROM lab7.Organisation" +
+                "UPDATE s409178.Organisation SET name = ?, annual_turnover = ?, full_name = ?, organisation_type = ?::s409178.organisationtype WHERE organisation_id = ?",
+                "UPDATE s409178.Coordinates SET coordinates_x = ?, coordinates_y = ? WHERE coordinates_id = (SELECT coordinates_id FROM s409178.Organisation" +
                         " WHERE organisation_id = ? LIMIT 1);",
-                "UPDATE lab7.Address SET zip_code = ? WHERE address_id = (SELECT address_id FROM lab7.Organisation WHERE organisation_id = ? LIMIT 1);",
-                "UPDATE lab7.Location SET location_x = ?, location_y = ?, location_z = ? WHERE location_id = (SELECT town FROM lab7.Address " +
-                        "WHERE address_id = (SELECT address_id FROM lab7.Organisation WHERE organisation_id = ? LIMIT 1) LIMIT 1);"
+                "UPDATE s409178.Address SET zip_code = ? WHERE address_id = (SELECT address_id FROM s409178.Organisation WHERE organisation_id = ? LIMIT 1);",
+                "UPDATE s409178.Location SET location_x = ?, location_y = ?, location_z = ? WHERE location_id = (SELECT town FROM s409178.Address " +
+                        "WHERE address_id = (SELECT address_id FROM s409178.Organisation WHERE organisation_id = ? LIMIT 1) LIMIT 1);"
 
         };
         int status;
@@ -176,11 +174,11 @@ public class DatabaseManager {
 
     private boolean writeOrganization(Organization organization){
         final String[] requests = new String[]{
-                "INSERT INTO lab7.Location (location_x, location_y, location_z) VALUES (?, ?, ?)",
-                "INSERT INTO lab7.Address (zip_code, town) VALUES (?, ?)",
-                "INSERT INTO lab7.Coordinates (coordinates_x, coordinates_y) VALUES (?, ?)",
-                "INSERT INTO lab7.Organisation (address_id, user_id, coordinates_id, organisation_type, name, annual_turnover, full_name)" +
-                        "VALUES (?, ?, ?, ?::lab7.organisationtype, ?, ?, ?)",
+                "INSERT INTO s409178.Location (location_x, location_y, location_z) VALUES (?, ?, ?)",
+                "INSERT INTO s409178.Address (zip_code, town) VALUES (?, ?)",
+                "INSERT INTO s409178.Coordinates (coordinates_x, coordinates_y) VALUES (?, ?)",
+                "INSERT INTO s409178.Organisation (address_id, user_id, coordinates_id, organisation_type, name, annual_turnover, full_name)" +
+                        "VALUES (?, ?, ?, ?::s409178.organisationtype, ?, ?, ?)",
         };
         final String[] idNames = new String[]{"location_id", "address_id", "coordinates_id", "organisation_id"};
         int[] ids = new int[4];
@@ -233,7 +231,7 @@ public class DatabaseManager {
     }
 
     public Integer getUserIdIfExist(String username, String password){
-        final String checkReq = "SELECT salt,password,user_id FROM lab7.User WHERE username = ? LIMIT 1";
+        final String checkReq = "SELECT salt,password,user_id FROM s409178.User WHERE username = ? LIMIT 1";
         Integer user_id = null;
         try (PreparedStatement creds = connection.prepareStatement(checkReq)){
             creds.setString(1, username);
@@ -259,7 +257,7 @@ public class DatabaseManager {
 
 
     public Boolean addUser(String username, String password){
-        final String addUsrReq = "INSERT INTO lab7.User (username, password, salt) VALUES (?, ?, ?)";
+        final String addUsrReq = "INSERT INTO s409178.User (username, password, salt) VALUES (?, ?, ?)";
         try (PreparedStatement status = connection.prepareStatement(addUsrReq)) {
             String salt = PasswordManager.generateSalt(30);
             status.setString(1, username);

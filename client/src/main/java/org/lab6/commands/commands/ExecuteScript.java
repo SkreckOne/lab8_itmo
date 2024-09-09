@@ -9,6 +9,7 @@ import common.utils.Command;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -22,7 +23,7 @@ public class ExecuteScript extends Command {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        if (args.get(ArgumentType.SCRIPT_NAME) != null) {
+        if (args.get(ArgumentType.SCRIPT_NAME) == null) {
             console.println("Использование: '" + getName() + "'");
             return new Response(Response.ResponseType.DEFAULT,true, "Некорректное использование...");
         }
@@ -33,7 +34,7 @@ public class ExecuteScript extends Command {
     }
 
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>();
+        return new ArrayList<>(List.of(ArgumentType.SCRIPT_NAME));
     };
 
 }
