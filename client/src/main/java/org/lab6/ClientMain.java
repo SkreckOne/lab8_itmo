@@ -16,7 +16,6 @@ public class ClientMain {
 //
 //    inc_ace_, [09.09.2024 13:41]
 //    s409178
-    private static final int PORT = 9999;
     public static final Logger logger = LogManager.getLogger("ClientLogger");
 
     public static void main(String[] args) {
