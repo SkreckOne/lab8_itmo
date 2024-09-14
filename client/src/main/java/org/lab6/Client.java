@@ -42,7 +42,7 @@ public class Client {
     }
 
 
-    public Response prepareCommand(String commandName, String userInput, Session session) throws IOException, ClassNotFoundException {
+    public Response prepareCommand(Command command, String userInput, Session session) throws IOException, ClassNotFoundException {
 
         String[] userCommand = (userInput.trim() + " ").split(" ", 2);
 
@@ -50,9 +50,8 @@ public class Client {
             userCommand = new String[]{userCommand[0], ""};
         }
 
-        Command command = commandManager.getCommands().get(commandName);
         if (command == null) {
-            return new Response(Response.ResponseType.DEFAULT, false, "Команда '" + commandName + "' не найдена.");
+            return new Response(Response.ResponseType.DEFAULT, false, "Команда '" + command.getName() + "' не найдена.");
         }
 
         Map<ArgumentType, Object> args;

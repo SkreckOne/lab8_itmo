@@ -16,6 +16,8 @@ public class Logout extends Command {
     public ArrayList<ArgumentType> getArgumentType() {return new ArrayList<>();}
 
     @Override
-    public Response apply(Map<ArgumentType, Object> args){return null;}
+    public Response apply(Map<ArgumentType, Object> args){
+        return null;
+    }
 
 }
