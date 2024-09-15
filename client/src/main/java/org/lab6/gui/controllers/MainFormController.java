@@ -4,6 +4,7 @@ import common.console.TextAreaConsole;
 import org.lab6.Client;
 import org.lab6.gui.localization.LanguagesEnum;
 import org.lab6.gui.models.AddCommandModel;
+import org.lab6.gui.models.CanvaModel;
 import org.lab6.gui.models.CommandsModel;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ public class MainFormController extends JFrame {
     private JPanel canvasPanel;
     private JTextField searchField;
     private JButton searchButton;
+    private CanvaModel canvaModel;
 
     private JTextField filterGreaterThanFullNameField;
     private JTextField filterLessThanFullNameField;
@@ -29,9 +31,14 @@ public class MainFormController extends JFrame {
     private final Client client;
 
     public MainFormController(String username, int userId, Client client) {
-        initUI(username, userId);
-        this.commandsModel = new CommandsModel(this, client, new TextAreaConsole(outputArea));
         this.client = client;
+        outputArea = new JTextArea();
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
+        outputArea.setEditable(false);
+        this.commandsModel = new CommandsModel(this, client, new TextAreaConsole(outputArea));
+        System.out.println(outputArea);
+        initUI(username, userId);
     }
 
     private void initUI(String username, int userId) {
@@ -61,15 +68,9 @@ public class MainFormController extends JFrame {
                 "Add", "Clear", "Filter Greater Than Full Name", "Filter Less Than Full Name", "Help", "History");
         mainContentPanel.add(leftPanel, BorderLayout.LINE_START);
 
-        canvasPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-            }
-        };
-        canvasPanel.setBackground(Color.WHITE);
-        canvasPanel.setBorder(new LineBorder(Color.GRAY, 1));
-        mainContentPanel.add(canvasPanel, BorderLayout.CENTER);
+        canvaModel = new CanvaModel(client);
+        canvaModel.setBorder(new LineBorder(Color.GRAY, 1));
+        mainContentPanel.add(canvaModel, BorderLayout.CENTER);
 
         JPanel rightPanel = createVerticalButtonPanel(
                 "Info", "Print Descending", "Remove by ID", "Remove Head", "Remove Lower", "Show Table");
@@ -104,10 +105,6 @@ public class MainFormController extends JFrame {
 
         bottomPanel.add(searchPanel, BorderLayout.NORTH);
 
-        outputArea = new JTextArea();
-        outputArea.setLineWrap(true);
-        outputArea.setWrapStyleWord(true);
-        outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
         bottomPanel.add(scrollPane, BorderLayout.CENTER);
         scrollPane.setBorder(new LineBorder(Color.GRAY, 1));
@@ -227,7 +224,7 @@ public class MainFormController extends JFrame {
                                 break;
                             case "Remove by ID":
                                 button.addActionListener(e -> commandsModel.removeById());
-                                   break;
+                                break;
                             case "Remove Head":
                                 button.addActionListener(e -> commandsModel.removeHead());
                                 break;
@@ -245,8 +242,8 @@ public class MainFormController extends JFrame {
 
     public String getInputForCommand(String commandName) {
         return switch (commandName) {
-            case "Filter Greater Than Full Name" -> filterGreaterThanFullNameField.getText();
-            case "Filter Less Than Full Name" -> filterLessThanFullNameField.getText();
+            case "filter_greater_than_full_name" -> filterGreaterThanFullNameField.getText();
+            case "filter_less_than_full_name" -> filterLessThanFullNameField.getText();
             case "remove_by_id" -> removeByIdField.getText();
             case "remove_lower" -> removeLowerField.getText();
             default -> "";
@@ -256,6 +253,7 @@ public class MainFormController extends JFrame {
     public void appendToOutput(String text) {
         SwingUtilities.invokeLater(() -> outputArea.append(text + "\n"));
     }
+
     private void openAddCommandController() {
         AddCommandModel addCommandModel = new AddCommandModel(client, this);
         new AddCommandController(this, addCommandModel);
@@ -264,5 +262,4 @@ public class MainFormController extends JFrame {
     private void showTableDialog() {
         new TableController(this, client, new TextAreaConsole(outputArea)); // The table dialog will block until closed
     }
-
 }

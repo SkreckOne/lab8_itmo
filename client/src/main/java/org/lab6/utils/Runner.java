@@ -13,6 +13,7 @@ import common.transfer.Response;
 import common.utils.ArgumentType;
 import common.utils.Command;
 
+
 import java.io.IOException;
 import java.util.*;
 
@@ -73,6 +74,7 @@ public class Runner {
         if (userCommand[0].isEmpty()) return ExitCode.OK;
         commandManager.addHistory(userCommand[0]);
         Command command = commandManager.getCommands().get(userCommand[0]);
+        console.println("1 launch");
         if (command == null) {
             console.printError("Команда '" + userCommand[0] + "' не найдена. Наберите 'help' для справки");
             return ExitCode.ERROR;
@@ -85,12 +87,14 @@ public class Runner {
             console.printError(e.getMessage());
             return ExitCode.ERROR;
         }
+        console.println("args launch");
 
         switch (userCommand[0]) {
             case "exit" -> {
                 return ExitCode.EXIT;
             }
             case "history" -> {
+                System.out.println(console);
                 console.println(commandManager.getHistory());
                 return ExitCode.OK;
             }
@@ -105,6 +109,7 @@ public class Runner {
                     console.printError(response != null ? response.getMessage() : "Не удалось получить ответ от сервера");
                     return ExitCode.ERROR;
                 }
+                console.println("hable launch");
                 responseHandler.handle(console, response, SessionHandler.getSession());
             }
         }

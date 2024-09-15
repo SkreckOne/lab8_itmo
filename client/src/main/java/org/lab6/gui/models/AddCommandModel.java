@@ -1,5 +1,6 @@
 package org.lab6.gui.models;
 
+import common.console.Console;
 import common.models.Organization;
 import common.transfer.Request;
 import common.transfer.Response;
@@ -17,12 +18,10 @@ import java.util.Map;
 
 public class AddCommandModel {
     private final Client client;
-    private final Runner runner;
     private final JFrame parentFrame;
 
     public AddCommandModel(Client client, JFrame parentFrame) {
         this.client = client;
-        this.runner = new Runner(null, client);
         this.parentFrame = parentFrame;
     }
 
