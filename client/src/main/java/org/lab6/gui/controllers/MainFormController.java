@@ -1,16 +1,17 @@
 package org.lab6.gui.controllers;
 
+import common.console.TextAreaConsole;
+import org.lab6.Client;
 import org.lab6.gui.localization.LanguagesEnum;
+import org.lab6.gui.models.CommandsModel;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainFormController extends JFrame {
-
+    private final CommandsModel commandsModel;
     private JComboBox<LanguagesEnum> languagesComboBox;
     private JLabel userInfoLabel;
     private JButton logoutButton;
@@ -19,8 +20,14 @@ public class MainFormController extends JFrame {
     private JTextField searchField;
     private JButton searchButton;
 
-    public MainFormController(String username, int userId) {
+    private JTextField filterGreaterThanFullNameField;
+    private JTextField filterLessThanFullNameField;
+    private JTextField removeByIdField;
+    private JTextField removeLowerField;
+
+    public MainFormController(String username, int userId, Client client) {
         initUI(username, userId);
+        this.commandsModel = new CommandsModel(this, client, new TextAreaConsole(outputArea));
     }
 
     private void initUI(String username, int userId) {
@@ -54,7 +61,6 @@ public class MainFormController extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // Custom painting logic here
             }
         };
         canvasPanel.setBackground(Color.WHITE);
@@ -74,7 +80,11 @@ public class MainFormController extends JFrame {
 
         add(splitPane, BorderLayout.CENTER);
 
+        logoutButton.addActionListener(e -> commandsModel.logout());
+
         searchButton.addActionListener(e -> searchInTextArea(searchField.getText()));
+
+        linkButtonActions(leftPanel, rightPanel);
     }
 
     private JPanel createBottomPanel() {
@@ -95,70 +105,154 @@ public class MainFormController extends JFrame {
         outputArea.setWrapStyleWord(true);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
-        bottomPanel.add(scrollPane, BorderLayout.CENTER);  // Place scrollable text area below the search panel
-        scrollPane.setBorder(new LineBorder(Color.GRAY, 1));  // Add border to the scroll pane
+        bottomPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBorder(new LineBorder(Color.GRAY, 1));
 
         return bottomPanel;
     }
 
     private JPanel createVerticalButtonPanel(String... buttonNames) {
         JPanel panel = new JPanel();
-        SpringLayout layout = new SpringLayout();
-        panel.setLayout(layout);
-        panel.setBorder(new LineBorder(Color.GRAY, 1));  // Separator
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        int maxWidth = 0;
         JButton[] buttons = new JButton[buttonNames.length];
+        JTextField[] textFields = new JTextField[buttonNames.length];
+
         for (int i = 0; i < buttonNames.length; i++) {
+            JPanel container = new JPanel();
+            container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+            container.setBorder(new LineBorder(Color.BLUE, 1));
+            container.setAlignmentX(Component.CENTER_ALIGNMENT);
+
             buttons[i] = new JButton(buttonNames[i]);
-            panel.add(buttons[i]);
+            buttons[i].setAlignmentX(Component.CENTER_ALIGNMENT);
+            buttons[i].setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            container.add(buttons[i]);
 
-            maxWidth = Math.max(maxWidth, buttons[i].getPreferredSize().width);
-        }
+            if (buttonRequiresTextField(buttonNames[i])) {
+                textFields[i] = new JTextField();
+                textFields[i].setAlignmentX(Component.CENTER_ALIGNMENT);
+                textFields[i].setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+                textFields[i].setBorder(new LineBorder(Color.GRAY, 1));
+                container.add(Box.createVerticalStrut(5));
+                container.add(textFields[i]);
 
-        Dimension buttonSize = new Dimension(maxWidth + 20, 30);
-        for (JButton button : buttons) {
-            button.setPreferredSize(buttonSize);
-        }
-
-        for (int i = 0; i < buttons.length; i++) {
-            layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, buttons[i], 0, SpringLayout.HORIZONTAL_CENTER, panel);  // Center horizontally
-            if (i == 0) {
-                layout.putConstraint(SpringLayout.NORTH, buttons[i], 10, SpringLayout.NORTH, panel);  // First button 10px from top
-            } else {
-                layout.putConstraint(SpringLayout.NORTH, buttons[i], 10, SpringLayout.SOUTH, buttons[i - 1]);  // 10px gap between buttons
+                switch (buttonNames[i]) {
+                    case "Filter Greater Than Full Name":
+                        filterGreaterThanFullNameField = textFields[i];
+                        break;
+                    case "Filter Less Than Full Name":
+                        filterLessThanFullNameField = textFields[i];
+                        break;
+                    case "Remove by ID":
+                        removeByIdField = textFields[i];
+                        break;
+                    case "Remove Lower":
+                        removeLowerField = textFields[i];
+                        break;
+                }
             }
+
+            panel.add(container);
+            panel.add(Box.createVerticalStrut(10));
         }
 
-        panel.setPreferredSize(new Dimension(maxWidth + 40, getHeight()));
         return panel;
     }
 
-    private void searchInTextArea(String searchText) {
-        try {
-            String content = outputArea.getText();
-            Pattern pattern = Pattern.compile(Pattern.quote(searchText), Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(content);
+    private boolean buttonRequiresTextField(String buttonName) {
+        return buttonName.equals("Filter Greater Than Full Name") ||
+                buttonName.equals("Filter Less Than Full Name") ||
+                buttonName.equals("Remove by ID") ||
+                buttonName.equals("Remove Lower");
+    }
 
-            if (matcher.find()) {
-                outputArea.setCaretPosition(matcher.start());  // Move cursor to the found text
-                outputArea.requestFocus();
-            } else {
-                JOptionPane.showMessageDialog(this, "Text not found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    private void searchInTextArea(String searchText) {
+        String content = outputArea.getText();
+        if (content.contains(searchText)) {
+            outputArea.setCaretPosition(content.indexOf(searchText));
+            outputArea.requestFocus();
+        } else {
+            JOptionPane.showMessageDialog(this, "Text not found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    // Add an ActionListener for the logout button
-    public void addLogoutListener(ActionListener listener) {
-        logoutButton.addActionListener(listener);
+    private void linkButtonActions(JPanel leftPanel, JPanel rightPanel) {
+        for (Component comp : leftPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel panel = (JPanel) comp;
+                for (Component innerComp : panel.getComponents()) {
+                    if (innerComp instanceof JButton) {
+                        JButton button = (JButton) innerComp;
+                        switch (button.getText()) {
+                            case "Clear":
+                                button.addActionListener(e -> commandsModel.clear());
+                                break;
+                            case "Filter Greater Than Full Name":
+                                button.addActionListener(e -> commandsModel.filterGreaterThanFullName());
+                                break;
+                            case "Filter Less Than Full Name":
+                                button.addActionListener(e -> commandsModel.filterLessThanFullName());
+                                break;
+                            case "Help":
+                                button.addActionListener(e -> commandsModel.help());
+                                break;
+                            case "History":
+                                button.addActionListener(e -> commandsModel.history());
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Component comp : rightPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel panel = (JPanel) comp;
+                for (Component innerComp : panel.getComponents()) {
+                    if (innerComp instanceof JButton) {
+                        JButton button = (JButton) innerComp;
+                        switch (button.getText()) {
+                            case "Info":
+                                button.addActionListener(e -> commandsModel.info());
+                                break;
+                            case "Print Descending":
+                                button.addActionListener(e -> commandsModel.printDescending());
+                                break;
+                            case "Remove by ID":
+                                button.addActionListener(e -> commandsModel.removeById());
+                                break;
+                            case "Remove Head":
+                                button.addActionListener(e -> commandsModel.removeHead());
+                                break;
+                            case "Remove Lower":
+                                button.addActionListener(e -> commandsModel.removeLower());
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    // Set output in the text area
+    public String getInputForCommand(String commandName) {
+        switch (commandName) {
+            case "Filter Greater Than Full Name":
+                return filterGreaterThanFullNameField.getText();
+            case "Filter Less Than Full Name":
+                return filterLessThanFullNameField.getText();
+            case "remove_by_id":
+                return removeByIdField.getText();
+            case "remove_lower":
+                return removeLowerField.getText();
+            default:
+                return "";
+        }
+    }
+
     public void appendToOutput(String text) {
-        outputArea.append(text + "\n");
+        SwingUtilities.invokeLater(() -> outputArea.append(text + "\n"));
     }
 
 }

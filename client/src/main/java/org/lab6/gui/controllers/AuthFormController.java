@@ -1,5 +1,7 @@
 package org.lab6.gui.controllers;
 
+import common.console.StandardConsole;
+import common.console.TextAreaConsole;
 import org.lab6.Client;
 import org.lab6.gui.localization.LanguagesEnum;
 import org.lab6.gui.models.AuthModel;
@@ -113,7 +115,7 @@ public class AuthFormController extends JFrame {
         boolean success = model.login(loginUsernameInput.getText(), new String(loginPasswordInput.getPassword()));
         if (success) {
             SwingUtilities.invokeLater(() -> {
-                MainFormController mainForm = new MainFormController(SessionHandler.getSession().getUsername(), SessionHandler.getSession().getUserId());
+                MainFormController mainForm = new MainFormController(SessionHandler.getSession().getUsername(), SessionHandler.getSession().getUserId(), model.getConnectionHandler());
                 mainForm.setVisible(true);
             });
             this.dispose();

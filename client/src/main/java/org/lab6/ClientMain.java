@@ -40,14 +40,10 @@ public class ClientMain {
                 form.setVisible(true);
             });
 
-            new Runner(console, client).interactiveMode();
-            client.close();
         } catch (ConnectException e) {
             logger.error("Сервер недоступен");
         } catch (IOException e) {
             logger.error(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 }

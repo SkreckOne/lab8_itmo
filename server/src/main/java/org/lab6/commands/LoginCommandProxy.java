@@ -22,6 +22,7 @@ public class LoginCommandProxy extends Command {
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
         Session session = (Session) args.get(ArgumentType.SESSION);
+        System.out.println(session);
         if (session == null) {return new Response(Response.ResponseType.DEFAULT,false, "Please login before use commands.");}
         Integer id = session.getUserId();
         if (id == null) {return new Response(Response.ResponseType.DEFAULT,false, "Please login before use commands.");}

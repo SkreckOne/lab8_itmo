@@ -28,9 +28,7 @@ public class CommandManager {
         commands.put("print_descending",  new LoginCommandProxy(new PrintDescending(console, collectionManager)));
         commands.put("history", new History());
         commands.put("save", new Save(console, collectionManager));
-        commands.put("set_creds",  new LoginCommandProxy(new SetCredentials()));
         commands.put("logout", new Logout());
-        commands.put("check_creds", new CheckCredentials());
         commands.put("login", new Login(console, userManager));
         commands.put("register", new Register(console, userManager));
     }

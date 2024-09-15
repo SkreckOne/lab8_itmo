@@ -23,6 +23,7 @@ public class LoginRequiredProxy extends Command {
     public ArrayList<ArgumentType> getArgumentType() {
         var commandArgs = command.getArgumentType();
         commandArgs.add(ArgumentType.SESSION);
+        System.out.println("Session arg added");
         return commandArgs;
     }
 

@@ -5,7 +5,6 @@ import common.transfer.Request;
 import common.transfer.Response;
 import common.transfer.Session;
 import common.utils.ArgumentType;
-import jdk.jshell.spi.ExecutionControl;
 import org.lab6.Client;
 import org.lab6.commands.commands.Login;
 import org.lab6.commands.commands.Register;
@@ -47,6 +46,7 @@ public class AuthModel {
             Response response = connectionHandler.sendAndReceiveCommand(request);
             if (response.isSuccess()){
                 SessionHandler.setSession(response.getSession());
+                System.out.println(SessionHandler.getSession().getUserId());
                 return true;
             }
             else {
