@@ -55,6 +55,34 @@ public class Organization implements Serializable, Validatable, Comparable<Organ
         return true;
     }
 
+    public boolean validateWithMessages(StringBuilder errorMessage) {
+        if (name == null || name.isEmpty()) {
+            errorMessage.append("Name cannot be empty.\n");
+            return false;
+        }
+        if (coordinates == null || !coordinates.validate()) {
+            errorMessage.append("Coordinates are invalid.\n");
+            return false;
+        }
+        if (annualTurnover == null || annualTurnover <= 0) {
+            errorMessage.append("Annual Turnover must be greater than 0.\n");
+            return false;
+        }
+        if (fullName == null || fullName.length() >= 1322) {
+            errorMessage.append("Full Name must be less than 1322 characters and cannot be null.\n");
+            return false;
+        }
+        if (type == null) {
+            errorMessage.append("Organization type cannot be null.\n");
+            return false;
+        }
+        if (postalAddress == null || !postalAddress.validate()) {
+            errorMessage.append("Postal Address is invalid.\n");
+            return false;
+        }
+        return true;
+    }
+
 
 
     @Override

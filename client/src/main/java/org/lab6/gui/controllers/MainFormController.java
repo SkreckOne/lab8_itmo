@@ -3,6 +3,7 @@ package org.lab6.gui.controllers;
 import common.console.TextAreaConsole;
 import org.lab6.Client;
 import org.lab6.gui.localization.LanguagesEnum;
+import org.lab6.gui.models.AddCommandModel;
 import org.lab6.gui.models.CommandsModel;
 
 import javax.swing.*;
@@ -24,10 +25,12 @@ public class MainFormController extends JFrame {
     private JTextField filterLessThanFullNameField;
     private JTextField removeByIdField;
     private JTextField removeLowerField;
+    private final Client client;
 
     public MainFormController(String username, int userId, Client client) {
         initUI(username, userId);
         this.commandsModel = new CommandsModel(this, client, new TextAreaConsole(outputArea));
+        this.client = client;
     }
 
     private void initUI(String username, int userId) {
@@ -186,6 +189,9 @@ public class MainFormController extends JFrame {
                     if (innerComp instanceof JButton) {
                         JButton button = (JButton) innerComp;
                         switch (button.getText()) {
+                            case "Add":
+                                button.addActionListener(e -> openAddCommandController());
+                                break;
                             case "Clear":
                                 button.addActionListener(e -> commandsModel.clear());
                                 break;
@@ -208,11 +214,9 @@ public class MainFormController extends JFrame {
         }
 
         for (Component comp : rightPanel.getComponents()) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
+            if (comp instanceof JPanel panel) {
                 for (Component innerComp : panel.getComponents()) {
-                    if (innerComp instanceof JButton) {
-                        JButton button = (JButton) innerComp;
+                    if (innerComp instanceof JButton button) {
                         switch (button.getText()) {
                             case "Info":
                                 button.addActionListener(e -> commandsModel.info());
@@ -237,22 +241,21 @@ public class MainFormController extends JFrame {
     }
 
     public String getInputForCommand(String commandName) {
-        switch (commandName) {
-            case "Filter Greater Than Full Name":
-                return filterGreaterThanFullNameField.getText();
-            case "Filter Less Than Full Name":
-                return filterLessThanFullNameField.getText();
-            case "remove_by_id":
-                return removeByIdField.getText();
-            case "remove_lower":
-                return removeLowerField.getText();
-            default:
-                return "";
-        }
+        return switch (commandName) {
+            case "Filter Greater Than Full Name" -> filterGreaterThanFullNameField.getText();
+            case "Filter Less Than Full Name" -> filterLessThanFullNameField.getText();
+            case "remove_by_id" -> removeByIdField.getText();
+            case "remove_lower" -> removeLowerField.getText();
+            default -> "";
+        };
     }
 
     public void appendToOutput(String text) {
         SwingUtilities.invokeLater(() -> outputArea.append(text + "\n"));
+    }
+    private void openAddCommandController() {
+        AddCommandModel addCommandModel = new AddCommandModel(client, this);
+        new AddCommandController(this, addCommandModel);
     }
 
 }
