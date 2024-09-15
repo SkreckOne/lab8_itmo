@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainFormController extends JFrame {
     private final CommandsModel commandsModel;
@@ -226,13 +227,15 @@ public class MainFormController extends JFrame {
                                 break;
                             case "Remove by ID":
                                 button.addActionListener(e -> commandsModel.removeById());
-                                break;
+                                   break;
                             case "Remove Head":
                                 button.addActionListener(e -> commandsModel.removeHead());
                                 break;
                             case "Remove Lower":
                                 button.addActionListener(e -> commandsModel.removeLower());
                                 break;
+                            case "Show Table":
+                                button.addActionListener(e -> showTableDialog());
                         }
                     }
                 }
@@ -256,6 +259,10 @@ public class MainFormController extends JFrame {
     private void openAddCommandController() {
         AddCommandModel addCommandModel = new AddCommandModel(client, this);
         new AddCommandController(this, addCommandModel);
+    }
+
+    private void showTableDialog() {
+        new TableController(this, client, new TextAreaConsole(outputArea)); // The table dialog will block until closed
     }
 
 }

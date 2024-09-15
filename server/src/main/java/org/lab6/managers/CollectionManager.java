@@ -92,12 +92,17 @@ public class CollectionManager {
     public boolean add(Organization organization) {
         lock.writeLock().lock();
         try {
-            if (checkIfContain(organization)) return false;
             if (dbManager.writerProvider(organization)) {
-                Map<String, Object> data = dbManager.getIdAndDate(organization.getFullName());
-                organization.setCreationDate((Date) data.get("creation_date"));
-                organization.setId((Integer) data.get("organisation_id"));
-                collection.add(organization);
+                if (!checkIfContain(organization)) {
+                    Map<String, Object> data = dbManager.getIdAndDate(organization.getFullName());
+                    organization.setCreationDate((Date) data.get("creation_date"));
+                    organization.setId((Integer) data.get("organisation_id"));
+                    collection.add(organization);
+                }
+                else{
+                    collection.removeIf(e -> e.getId() == organization.getId());
+                    collection.add(organization);
+                }
                 return true;
             } else {
                 return false;
@@ -189,11 +194,11 @@ public class CollectionManager {
         }
     }
 
-    public boolean removeLower(Organization organization) {
+    public boolean removeLower(String organization, int ownerID) {
         lock.writeLock().lock();
         try {
             return collection.removeIf(org ->
-                    (org.compareTo(organization) < 0 && org.getOwnerId() == organization.getOwnerId() && dbManager.deleteOrganization(org))
+                    (org.getFullName().compareTo(organization) < 0 && org.getOwnerId() == ownerID && dbManager.deleteOrganization(org))
             );
         } finally {
             lock.writeLock().unlock();

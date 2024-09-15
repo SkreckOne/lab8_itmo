@@ -10,7 +10,7 @@ import java.util.Map;
 public class Show extends Command {
     private static final long serialVersionUID = 315331L;
     public Show() {
-        super("help", "list of all commands available");
+        super("show", "show all element in collection");
     }
 
     @Override

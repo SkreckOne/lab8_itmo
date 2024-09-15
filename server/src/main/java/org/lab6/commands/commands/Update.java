@@ -37,8 +37,9 @@ public class Update extends Command {
             Organization d = (Organization) args.get(ArgumentType.ORGANIZATION);
             d.setId(id);
             if (d.validate()) {
-                collectionManager.add(d);
-                return new Response(Response.ResponseType.DEFAULT,true, null);
+                if (collectionManager.add(d)){
+                return new Response(Response.ResponseType.DEFAULT,true, null);}
+                else {return new Response(Response.ResponseType.DEFAULT,false, "Что-то не так! Организация не создана");}
             } else {
                 return new Response(Response.ResponseType.DEFAULT,false, "Поля не валидны! Организация не создана");
             }

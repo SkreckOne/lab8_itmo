@@ -178,6 +178,7 @@ public class Server {
             try {
                 RequestContext requestContext = requestQueue.take();
                 Request request = requestContext.getRequest();
+                System.out.println("processRequest: " + request);
 
 
                 Response response = processRequest(request);
@@ -194,6 +195,7 @@ public class Server {
             try {
                 ResponseContext responseContext = responseQueue.take();
                 Response response = responseContext.getResponse();
+                System.out.println("sendResponse: " + response.getCommands() + " " + response.getMessage());
                 DatagramChannel channel = responseContext.getChannel();
                 InetSocketAddress clientAddress = responseContext.getClientAddress();
 

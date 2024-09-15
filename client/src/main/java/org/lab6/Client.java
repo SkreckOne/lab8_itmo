@@ -4,6 +4,7 @@ import common.transfer.Request;
 import common.transfer.Response;
 import org.apache.logging.log4j.Logger;
 import org.lab6.managers.CommandManager;
+import org.lab6.utils.SessionHandler;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -41,6 +42,7 @@ public class Client {
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(request);
         oos.flush();
+
 
         buffer.clear();
         buffer.put(bos.toByteArray());

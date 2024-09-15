@@ -27,8 +27,9 @@ public class CommandsModel {
             protected Void doInBackground() throws Exception {
                 try {
                     String userInput = getUserInput(commandName);
+                    System.out.println("Command name: " + commandName);
+                    System.out.println("Command args: " + userInput);
                     String[] userCommand = {commandName, userInput};
-
                     Runner.ExitCode exitCode = runner.launchCommand(userCommand);
 
                     if (exitCode == Runner.ExitCode.ERROR) {

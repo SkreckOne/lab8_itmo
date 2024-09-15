@@ -3,6 +3,7 @@ package org.lab6.commands.commands;
 import common.console.Console;
 import common.models.Organization;
 import common.transfer.Response;
+import common.transfer.Session;
 import common.utils.ArgumentType;
 import common.utils.Command;
 import org.lab6.managers.CollectionManager;
@@ -23,14 +24,15 @@ public class RemoveLower extends Command {
 
     @Override
     public Response apply(Map<ArgumentType, Object> args) {
-        Organization organization = (Organization) args.get(ArgumentType.ORGANIZATION);
-        var res = collectionManager.removeLower(organization);
+        String organization = (String) args.get(ArgumentType.FULLNAME);
+        Session session = (Session) args.get(ArgumentType.SESSION);
+        var res = collectionManager.removeLower(organization, session.getUserId());
         if (res)
             return new Response(Response.ResponseType.DEFAULT,res, "Организации успешно удалены.");
         else
             return new Response(Response.ResponseType.DEFAULT,res, "Что-то пошло не так");
     }
     public ArrayList<ArgumentType> getArgumentType() {
-        return new ArrayList<>(List.of(ArgumentType.ORGANIZATION));
+        return new ArrayList<>(List.of(ArgumentType.FULLNAME));
     }
 }
