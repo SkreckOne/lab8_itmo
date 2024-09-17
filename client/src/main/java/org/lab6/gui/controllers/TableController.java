@@ -27,7 +27,7 @@ public class TableController extends JDialog {
     private List<Organization> organizations;
     private boolean changesMade = false;
 
-    public TableController(JFrame parent, Client client, Console outputArea) {
+    public  TableController(JFrame parent, Client client, Console outputArea) {
         super(parent, "Organization Table", true);
         this.client = client;
         this.outputArea = outputArea;
