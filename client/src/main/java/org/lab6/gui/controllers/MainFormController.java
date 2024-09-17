@@ -11,7 +11,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.io.IOException;
 
 public class MainFormController extends JFrame {
     private final CommandsModel commandsModel;

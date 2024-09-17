@@ -57,11 +57,8 @@ public class CanvaModel extends JPanel {
 
             @Override
             protected List<Organization> doInBackground() throws Exception {
-                while (!isCancelled()) {
                     Thread.sleep(6000);
                     return fetchOrganizations();
-                }
-                return null;
             }
 
             @Override

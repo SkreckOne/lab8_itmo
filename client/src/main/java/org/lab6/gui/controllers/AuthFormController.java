@@ -56,7 +56,6 @@ public class AuthFormController extends JFrame {
         gbc.weightx = 0.9;
         panel.add(languagesComboBox, gbc);
 
-        // Username input
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.1;
@@ -69,7 +68,6 @@ public class AuthFormController extends JFrame {
         gbc.weightx = 0.9;
         panel.add(loginUsernameInput, gbc);
 
-        // Password input
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.1;
