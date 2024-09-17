@@ -15,14 +15,10 @@ import java.io.IOException;
 
 public class MainFormController extends JFrame {
     private final CommandsModel commandsModel;
-    private JComboBox<LanguagesEnum> languagesComboBox;
-    private JLabel userInfoLabel;
-    private JButton logoutButton;
-    private JTextArea outputArea;
+    private final JTextArea outputArea;
     private JPanel canvasPanel;
     private JTextField searchField;
     private JButton searchButton;
-    private CanvaModel canvaModel;
 
     private JTextField filterGreaterThanFullNameField;
     private JTextField filterLessThanFullNameField;
@@ -50,14 +46,14 @@ public class MainFormController extends JFrame {
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new BorderLayout());
-        languagesComboBox = new JComboBox<>(LanguagesEnum.values());
+        JComboBox<LanguagesEnum> languagesComboBox = new JComboBox<>(LanguagesEnum.values());
         topPanel.add(languagesComboBox, BorderLayout.WEST);
 
-        userInfoLabel = new JLabel("User: " + username + " (ID: " + userId + ")");
+        JLabel userInfoLabel = new JLabel("User: " + username + " (ID: " + userId + ")");
         userInfoLabel.setHorizontalAlignment(JLabel.CENTER);
         topPanel.add(userInfoLabel, BorderLayout.CENTER);
 
-        logoutButton = new JButton("Logout");
+        JButton logoutButton = new JButton("Logout");
         topPanel.add(logoutButton, BorderLayout.EAST);
         add(topPanel, BorderLayout.PAGE_START);
         topPanel.setBorder(new LineBorder(Color.GRAY, 1));
@@ -68,7 +64,7 @@ public class MainFormController extends JFrame {
                 "Add", "Clear", "Filter Greater Than Full Name", "Filter Less Than Full Name", "Help", "History");
         mainContentPanel.add(leftPanel, BorderLayout.LINE_START);
 
-        canvaModel = new CanvaModel(client);
+        CanvaModel canvaModel = new CanvaModel(client);
         canvaModel.setBorder(new LineBorder(Color.GRAY, 1));
         mainContentPanel.add(canvaModel, BorderLayout.CENTER);
 
@@ -181,11 +177,9 @@ public class MainFormController extends JFrame {
 
     private void linkButtonActions(JPanel leftPanel, JPanel rightPanel) {
         for (Component comp : leftPanel.getComponents()) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
+            if (comp instanceof JPanel panel) {
                 for (Component innerComp : panel.getComponents()) {
-                    if (innerComp instanceof JButton) {
-                        JButton button = (JButton) innerComp;
+                    if (innerComp instanceof JButton button) {
                         switch (button.getText()) {
                             case "Add":
                                 button.addActionListener(e -> openAddCommandController());

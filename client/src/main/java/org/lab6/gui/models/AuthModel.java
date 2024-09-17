@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 public class AuthModel {
-    private Client connectionHandler;
+    private final Client connectionHandler;
     private final AuthFormController controller;
 
     public AuthModel(Client connectionHandler, AuthFormController controller) {

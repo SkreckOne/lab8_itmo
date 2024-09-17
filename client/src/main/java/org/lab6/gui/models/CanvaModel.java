@@ -32,7 +32,6 @@ public class CanvaModel extends JPanel {
         setPreferredSize(new Dimension(canvasWidth, canvasHeight));
         setBackground(Color.WHITE);
 
-        // Add a listener for window resizing
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
