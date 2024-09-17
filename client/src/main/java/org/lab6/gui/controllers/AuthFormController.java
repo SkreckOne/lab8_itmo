@@ -1,7 +1,5 @@
 package org.lab6.gui.controllers;
 
-import common.console.StandardConsole;
-import common.console.TextAreaConsole;
 import org.lab6.Client;
 import org.lab6.gui.localization.LanguagesEnum;
 import org.lab6.gui.models.AuthModel;
@@ -9,6 +7,8 @@ import org.lab6.utils.SessionHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class AuthFormController extends JFrame {
 
@@ -18,6 +18,10 @@ public class AuthFormController extends JFrame {
     private JButton loginButton;
     private JButton registerButton;
     private JComboBox<LanguagesEnum> languagesComboBox;
+    private ResourceBundle bundle;
+    private JLabel userLabel;
+    private JLabel passwordLabel;
+    private JLabel langLabel;
 
     public AuthFormController(Client client) {
         this.model = new AuthModel(client, this);
@@ -30,6 +34,9 @@ public class AuthFormController extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        Locale.setDefault(new Locale("en", "ZA"));
+        bundle = ResourceBundle.getBundle("messages", Locale.getDefault());
+
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -38,7 +45,8 @@ public class AuthFormController extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.1;
-        panel.add(new JLabel("Select Language:"), gbc);
+        langLabel = new JLabel(bundle.getString("select_language"));
+        panel.add(langLabel, gbc);
 
         languagesComboBox = new JComboBox<>(LanguagesEnum.values());
         languagesComboBox.addActionListener(e -> changeLanguage());
@@ -48,10 +56,12 @@ public class AuthFormController extends JFrame {
         gbc.weightx = 0.9;
         panel.add(languagesComboBox, gbc);
 
+        // Username input
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.1;
-        panel.add(new JLabel("Username:"), gbc);
+        userLabel = new JLabel(bundle.getString("username"));
+        panel.add(userLabel, gbc);
 
         loginUsernameInput = new JTextField();
         gbc.gridx = 1;
@@ -59,10 +69,12 @@ public class AuthFormController extends JFrame {
         gbc.weightx = 0.9;
         panel.add(loginUsernameInput, gbc);
 
+        // Password input
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.1;
-        panel.add(new JLabel("Password:"), gbc);
+        passwordLabel= new JLabel(bundle.getString("password"));
+        panel.add(passwordLabel, gbc);
 
         loginPasswordInput = new JPasswordField();
         gbc.gridx = 1;
@@ -70,7 +82,7 @@ public class AuthFormController extends JFrame {
         gbc.weightx = 0.9;
         panel.add(loginPasswordInput, gbc);
 
-        loginButton = new JButton("Login");
+        loginButton = new JButton(bundle.getString("login"));
         loginButton.addActionListener(e -> login());
 
         gbc.gridx = 0;
@@ -79,7 +91,7 @@ public class AuthFormController extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         panel.add(loginButton, gbc);
 
-        registerButton = new JButton("Register");
+        registerButton = new JButton(bundle.getString("register"));
         registerButton.addActionListener(e -> register());
 
         gbc.gridx = 1;
@@ -88,12 +100,25 @@ public class AuthFormController extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         panel.add(registerButton, gbc);
 
-
         add(panel);
     }
 
     private void changeLanguage() {
         LanguagesEnum selectedLanguage = (LanguagesEnum) languagesComboBox.getSelectedItem();
+        Locale.setDefault(selectedLanguage.getLocale());
+
+        bundle = ResourceBundle.getBundle("messages", selectedLanguage.getLocale());
+
+        updateUIWithBundle(bundle);
+    }
+
+    private void updateUIWithBundle(ResourceBundle bundle) {
+        setTitle(bundle.getString("auth_form_title"));
+        loginButton.setText(bundle.getString("login"));
+        registerButton.setText(bundle.getString("register"));
+        userLabel.setText(bundle.getString("username"));
+        passwordLabel.setText(bundle.getString("password"));
+        langLabel.setText(bundle.getString("select_language"));
     }
 
     private void register() {
@@ -101,9 +126,9 @@ public class AuthFormController extends JFrame {
 
         boolean success = model.register(loginUsernameInput.getText(), new String(loginPasswordInput.getPassword()));
         if (success) {
-            JOptionPane.showMessageDialog(this, "Registration successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, bundle.getString("registration_success"), bundle.getString("success"), JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Error occurred while registering", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, bundle.getString("registration_error"), bundle.getString("error"), JOptionPane.ERROR_MESSAGE);
         }
 
         registerButton.setEnabled(true);
@@ -120,7 +145,7 @@ public class AuthFormController extends JFrame {
             });
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Error occurred while authorizing", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, bundle.getString("login_error"), bundle.getString("error"), JOptionPane.ERROR_MESSAGE);
             loginButton.setEnabled(true);
         }
     }

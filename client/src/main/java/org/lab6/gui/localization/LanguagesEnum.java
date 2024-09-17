@@ -1,30 +1,27 @@
 package org.lab6.gui.localization;
 
+import java.util.Locale;
+
 public enum LanguagesEnum {
-    RUSSIAN("RU", "ru"),
-    DUTCH("NL", "nl"),
-    FRENCH("FR", "fr"),
-    SPANISH_NICARAGUA("NI", "es");
+    RUSSIAN("Русский", new Locale("ru", "RU")),
+    ESTONIAN("Eesti", new Locale("et", "EE")),
+    CATALAN("Català", new Locale("ca", "ES")),
+    ENGLISH_SA("English (South Africa)", new Locale("en", "ZA"));
 
+    private final String displayName;
+    private final Locale locale;
 
-    private final String name;
-    private final String languageName;
-
-    LanguagesEnum(String name, String languageName) {
-        this.name = name;
-        this.languageName = languageName;
+    LanguagesEnum(String displayName, Locale locale) {
+        this.displayName = displayName;
+        this.locale = locale;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getLanguageName() {
-        return languageName;
+    public Locale getLocale() {
+        return locale;
     }
 
     @Override
     public String toString() {
-        return name;
+        return displayName;
     }
 }
